@@ -1,0 +1,9 @@
+:~  title+'Surface'
+    info+'A juicy little tidepool'
+    color+0xf7.f0a3
+    version+[0 0 1]
+    website+'https://tlon.io'
+    license+'MIT'
+    base+'surface'
+    glob-http+['https://s3.amazonaws.com/ocean.slow.so/glob-0v2.d4jso.2nhbv.j74lb.alapr.jmbpf.glob' 0v2.d4jso.2nhbv.j74lb.alapr.jmbpf]
+==

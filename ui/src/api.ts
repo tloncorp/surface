@@ -3,6 +3,7 @@ import { Pikes } from "@urbit/api/dist/api";
 import { Patp } from "@urbit/http-api";
 import {
   ChatPerm,
+  ChatWrits,
   Club,
   Clubs,
   Pins,
@@ -47,12 +48,12 @@ export const getChats = async () => {
   });
 };
 
-export const getChatMessages = async (shipId: Patp, count: number) => {
-  return await urbit.scry<Clubs>({
-    app: "chat",
-    path: `/dm/${shipId}/writs/newest/${count}.json`,
-  });
-};
+// export const getChatMessages = async (shipId: Patp, count: number) => {
+//   return await urbit.scry<Clubs>({
+//     app: "chat",
+//     path: `/dm/${shipId}/writs/newest/${count}.json`,
+//   });
+// };
 
 export const getGroupChats = async () => {
   return await urbit.scry<Clubs>({
@@ -158,4 +159,29 @@ export const getPeer = async (peer: string): Promise<Peer> => {
   return await fetch(`/~debug/ames/peer/${deSig(peer)}.json`).then((res) =>
     res.json()
   );
+};
+
+export const getChatMessages = ({
+  type,
+  conversation,
+  count,
+}: {
+  type: "dm" | "club" | "chat";
+  conversation: string;
+  count: number;
+}) => {
+  return urbit.scry<ChatWrits>({
+    app: "chat",
+    path: `/${type}/${conversation}/writs/newest/${count}`,
+  });
+};
+
+export const subscribeToChatUpdates = () => {
+  return urbit.subscribe({
+    app: "chat",
+    path: "/briefs",
+    event: (data, mark) => {
+      console.log(data, mark);
+    },
+  });
 };

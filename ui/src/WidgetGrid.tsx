@@ -6,17 +6,17 @@ import React, {
   useRef,
   useState,
 } from "react";
-import ReactGridLayout, { Layout } from "react-grid-layout";
+import ReactGridLayout, { DragOverEvent, Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import WidgetList from "./WidgetList";
 import Widget, { WidgetConfig } from "./widgets/Widget";
 
-const gridSize = 30;
+const gridSize = 100;
 
 const defaultSize = {
-  w: 15,
-  h: 10,
+  w: 3,
+  h: 2,
 };
 
 interface GridItemConfig {
@@ -78,6 +78,10 @@ const WidgetGrid = () => {
     isResizing.current = false;
   }, []);
 
+  const handleDragOver = useCallback((event: DragOverEvent) => {
+    return { ...defaultSize };
+  }, []);
+
   const handleLayoutChange = useCallback((newLayouts: Layout[]) => {
     if (isResizing.current) return;
     setItems((items) => {
@@ -104,20 +108,20 @@ const WidgetGrid = () => {
     <div
       ref={gridRef}
       style={{
+        display: "flex",
         position: "relative",
         height: "100vh",
-        background: "#efefef",
         overflow: "hidden",
         flex: 1,
-        display: "flex",
       }}
     >
       {config ? (
         <ReactGridLayout
           style={{
-            padding: 0.5,
             height: "100%",
+            width: "100%",
           }}
+          onDropDragOver={handleDragOver}
           onResizeStart={handleResizeStart}
           onResizeStop={handleResizeStop}
           onDrop={handleDrop}

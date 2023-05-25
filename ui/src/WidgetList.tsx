@@ -1,4 +1,10 @@
-import React, { DragEvent, useCallback, useMemo, useState } from "react";
+import React, {
+  DragEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useQuery } from "react-query";
 import * as api from "./api";
 import { WidgetConfig } from "./widgets/Widget";
@@ -46,12 +52,26 @@ export default function WidgetList() {
   const allProfilesQuery = useQuery("contacts", api.getContacts);
   const allPeersQuery = useQuery("ships", api.getPeers);
   const allAppsQuery = useQuery("apps", api.getInstalledApps);
+  const allGroups = useQuery("groups", api.getGroups);
+
+  useEffect(() => {
+    api.subscribeToChatUpdates();
+    api
+      .getChatMessages({
+        type: "chat",
+        conversation: "~riprud-tidmel/ruffs-n-riffs",
+        count: 10,
+      })
+      .then((data) => {
+        console.log("GOt mssg", data);
+      });
+  }, []);
 
   const allPeers = useMemo(() => {
     return allPeersQuery.data?.known ?? [];
   }, [allPeersQuery.data]);
 
-  console.log(allAppsQuery.data);
+  console.log("Groups", allGroups.data);
 
   const treeItems: TreeItemProps[] = [
     {
@@ -85,6 +105,13 @@ export default function WidgetList() {
           },
         })
       ),
+    },
+    {
+      label: "Groups",
+      children: Object.entries(allGroups.data ?? {}).map(([name, data]) => ({
+        label: name,
+        config: data,
+      })),
     },
   ];
 

@@ -9,7 +9,7 @@ import packageJson from "./package.json";
 export default ({ mode }: { mode: string }) => {
   Object.assign(process.env, loadEnv(mode, process.cwd()));
 
-  const app = process.env.APP || "groups";
+  const app = process.env.APP || "surface";
   process.env.VITE_APP = app;
   process.env.VITE_STORAGE_VERSION =
     mode === "dev" ? Date.now().toString() : packageJson.version;
@@ -18,12 +18,10 @@ export default ({ mode }: { mode: string }) => {
     process.env.SHIP_URL ||
     process.env.VITE_SHIP_URL ||
     "http://localhost:8080";
-  console.log(SHIP_URL);
   const SHIP_URL2 =
     process.env.SHIP_URL2 ||
     process.env.VITE_SHIP_URL2 ||
     "http://localhost:8080";
-  console.log(SHIP_URL2);
 
   const base = (mode: string, app: string) => {
     if (mode === "mock" || mode === "staging") {
@@ -43,8 +41,6 @@ export default ({ mode }: { mode: string }) => {
       return [basicSsl(), react()];
     }
 
-    console.log(mode, SHIP_URL);
-
     switch (app) {
       case "chat":
         return [
@@ -58,6 +54,12 @@ export default ({ mode }: { mode: string }) => {
           react(),
         ];
       default:
+        console.log(
+          "default plugins",
+          mode,
+          app,
+          mode === "dev2" ? SHIP_URL2 : SHIP_URL
+        );
         return [
           process.env.SSL === "true" ? basicSsl() : null,
           urbitPlugin({
@@ -85,30 +87,6 @@ export default ({ mode }: { mode: string }) => {
         "lodash/fp": ["lodash/fp"],
         "@urbit/api": ["@urbit/api"],
         "@urbit/http-api": ["@urbit/http-api"],
-        "@tlon/sigil-js": ["@tlon/sigil-js"],
-        "any-ascii": ["any-ascii"],
-        "react-beautiful-dnd": ["react-beautiful-dnd"],
-        "emoji-mart": ["emoji-mart"],
-        "prosemirror-view": ["prosemirror-view"],
-        "@tiptap/core": ["@tiptap/core"],
-        "@tiptap/extension-placeholder": ["@tiptap/extension-placeholder"],
-        "@tiptap/extension-link": ["@tiptap/extension-link"],
-        "react-virtuoso": ["react-virtuoso"],
-        "react-select": ["react-select"],
-        "react-hook-form": ["react-hook-form"],
-        "framer-motion": ["framer-motion"],
-        "date-fns": ["date-fns"],
-        "tippy.js": ["tippy.js"],
-        "@aws-sdk/client-s3": ["@aws-sdk/client-s3"],
-        "@aws-sdk/s3-request-presigner": ["@aws-sdk/s3-request-presigner"],
-        refractor: ["refractor"],
-        "urbit-ob": ["urbit-ob"],
-        "hast-to-hyperscript": ["hast-to-hyperscript"],
-        "@radix-ui/react-dialog": ["@radix-ui/react-dialog"],
-        "@radix-ui/react-dropdown-menu": ["@radix-ui/react-dropdown-menu"],
-        "@radix-ui/react-popover": ["@radix-ui/react-popover"],
-        "@radix-ui/react-toast": ["@radix-ui/react-toast"],
-        "@radix-ui/react-tooltip": ["@radix-ui/react-tooltip"],
       },
     },
   };
@@ -124,6 +102,7 @@ export default ({ mode }: { mode: string }) => {
       mode !== "profile"
         ? {
             sourcemap: false,
+
             rollupOptions,
           }
         : ({

@@ -80,3 +80,18 @@ const ChannelListWidget = ({ groupId }: { groupId?: string | null }) => {
   );
   return query.data ? <pre>{JSON.stringify(query.data, null, 2)}</pre> : null;
 };
+
+const ChannelWidget = ({
+  groupId,
+  channelId,
+}: {
+  groupId?: string | null;
+  channelId?: string | null;
+}) => {
+  // const query = useQuery(["channel", groupId, channelId], () =>
+  //   groupId && channelId
+  //     ? api.getChannel(groupId, channelId)
+  //     : Promise.resolve(null)
+  // );
+  // return query.data ? <pre>{JSON.stringify(query.data, null, 2)}</pre> : null;
+};
