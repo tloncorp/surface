@@ -5,7 +5,7 @@ import {
   OnDragEndResponder,
 } from "react-beautiful-dnd";
 import Tab from "./Tab";
-import tabStyle from "./tabStyle";
+import tabStyle from "../styles";
 import { TabConfig } from "../types";
 
 const TabList = ({

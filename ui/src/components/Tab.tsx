@@ -1,6 +1,6 @@
 import { MouseEventHandler, useCallback } from "react";
 import { Draggable } from "react-beautiful-dnd";
-import tabStyle from "./tabStyle";
+import tabStyle from "../styles";
 import { TabConfig } from "../types";
 
 const Tab = ({

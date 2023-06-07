@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { InteractionContextProvider } from "./InteractionContext";
 import TabbedSurface from "./TabbedSurface";
 
-function App() {
+function Root() {
   const queryClient = useMemo(() => new QueryClient(), []);
 
   return (
@@ -15,4 +15,4 @@ function App() {
   );
 }
 
-export default App;
+export default Root;
