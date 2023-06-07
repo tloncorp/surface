@@ -1,20 +1,16 @@
-import { getQueryParam, setQueryParam } from "@/util";
+import { getQueryParam, setQueryParam } from "../util";
 import {
   CSSProperties,
-  MouseEventHandler,
   useCallback,
-  useContext,
   useEffect,
   useMemo,
-  useRef,
   useState,
 } from "react";
+import { TabConfig } from "../types";
 import useSyncedStorage from "../useSyncedStorage";
-import { InteractionContext } from "./InteractionContext";
 import NewTabModal from "./NewTabModal";
 import TabContent from "./TabContent";
 import TabList from "./TabList";
-import { TabConfig } from "../types";
 
 const TabbedSurface = () => {
   const {
@@ -30,13 +26,15 @@ const TabbedSurface = () => {
 
   const [showNewTabPicker, setShowNewTabPicker] = useState(false);
 
-  const handlePressAddTab = useCallback(() => {
-    setShowNewTabPicker((p) => !p);
-  }, []);
+  const handlePressAddTab = useCallback(
+    () => setShowNewTabPicker((p) => !p),
+    []
+  );
 
-  const handleNewTabPickerClosed = useCallback(() => {
-    setShowNewTabPicker(false);
-  }, []);
+  const handleNewTabPickerClosed = useCallback(
+    () => setShowNewTabPicker(false),
+    []
+  );
 
   const handleTabAdded = useCallback(
     ({ title, path }: { title: string; path: string }) => {
@@ -47,9 +45,10 @@ const TabbedSurface = () => {
     [addTab]
   );
 
-  const tabContent = useMemo(() => {
-    return tabs.sort((a, b) => a.addedAt - b.addedAt);
-  }, [tabs]);
+  const tabContent = useMemo(
+    () => tabs.sort((a, b) => a.addedAt - b.addedAt),
+    [tabs]
+  );
 
   const handleTabSelected = useCallback(
     (tab: TabConfig) => setActiveTab(tab.id),
@@ -75,46 +74,9 @@ const TabbedSurface = () => {
   );
 
   const handleTabSplit = useCallback(
-    (tab: TabConfig) => {
-      splitTab(tab.id);
-    },
+    (tab: TabConfig) => splitTab(tab.id),
     [splitTab]
   );
-
-  const { setIsDragging } = useContext(InteractionContext);
-
-  const contenterContainerRef = useRef<HTMLDivElement>(null);
-
-  const [paneSizes, setPaneSizes] = useState<number[]>([]);
-
-  const handleStartSplitAdjustment: MouseEventHandler<HTMLDivElement> =
-    useCallback((e) => {
-      const startPosition = e.clientX;
-      setIsDragging(true);
-      const handleMouseMove = (e) => {
-        if (!contenterContainerRef.current) return;
-        const offset = e.clientX - startPosition;
-        const delta = offset / contenterContainerRef.current?.offsetWidth;
-      };
-      const handleMouseUp = () => {
-        clearHandlers();
-      };
-      const handleMouseLeave = () => {
-        clearHandlers();
-      };
-      const clearHandlers = () => {
-        setIsDragging(false);
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("mouseup", handleMouseUp);
-        window.removeEventListener("mouseleave", handleMouseLeave);
-      };
-      window.addEventListener("mousemove", handleMouseMove);
-      window.addEventListener("mouseup", handleMouseUp, true);
-      document.addEventListener("mouseleave", handleMouseLeave);
-    }, []);
-
-  const [containerSize, setContainerSize] = useState({ width: 0, height: 0 });
-  const handleTabContainerLayout = useCallback(() => {}, []);
 
   return (
     <div style={styles.container}>
@@ -128,31 +90,16 @@ const TabbedSurface = () => {
         onTabSplit={handleTabSplit}
         onTabsCombined={handleTabsCombined}
       />
-
-      <div
-        style={{ flex: 1, display: "flex", position: "relative" }}
-        ref={contenterContainerRef}
-      >
+      <div style={styles.contentContainer}>
         {tabContent.map((tab) => {
           return (
-            <div key={tab.id} style={styles.container}>
-              {tab.panes.map((pane, index) => {
-                return (
-                  <>
-                    <TabContent
-                      config={{ path: pane.path }}
-                      isLive={tab.id === activeTab}
-                    />
-                    {index !== tab.panes.length - 1 && (
-                      // Add resize handle between panes
-                      <div
-                        onMouseDown={handleStartSplitAdjustment}
-                        style={styles.resizeHandle}
-                      />
-                    )}
-                  </>
-                );
-              })}
+            <div key={tab.id} style={styles.tabContentContainer}>
+              {tab.panes.map((pane) => (
+                <TabContent
+                  config={{ path: pane.path }}
+                  isLive={tab.id === activeTab}
+                />
+              ))}
             </div>
           );
         })}
@@ -160,7 +107,7 @@ const TabbedSurface = () => {
 
       <NewTabModal
         isOpen={showNewTabPicker}
-        onTabPicked={handleTabAdded}
+        onTabSelected={handleTabAdded}
         onClose={handleNewTabPickerClosed}
       />
     </div>
@@ -174,6 +121,10 @@ const styles: Record<string, CSSProperties> = {
     flex: 1,
     backgroundColor: "#E5e5e5",
   },
+  contentContainer: {
+    position: "relative",
+    flex: 1,
+  },
   tabContentContainer: {
     position: "absolute",
     top: 0,
@@ -182,6 +133,8 @@ const styles: Record<string, CSSProperties> = {
     height: "100%",
     padding: 8,
     paddingTop: 0,
+    display: "flex",
+    gap: 8,
   },
   resizeHandle: {
     cursor: "pointer",
@@ -240,7 +193,6 @@ const useTabs = () => {
    */
   const combineTabs = useCallback(
     (draggedId: string, dropTargetId: string) => {
-      console.log("comine", draggedId, dropTargetId);
       // Get indexes of specified tabs and sort --
       const draggedIndex = tabIndexes?.[draggedId] ?? -1;
       const dropTargetIndex = tabIndexes?.[dropTargetId] ?? -1;
@@ -268,7 +220,6 @@ const useTabs = () => {
           return [tab];
         }
       });
-      console.log(newTabs);
       setTabs(newTabs);
       setActiveTab(newTab.id);
     },

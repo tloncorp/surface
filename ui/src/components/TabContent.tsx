@@ -38,6 +38,15 @@ const TabContent = ({
     <div
       style={{
         ...styles.container,
+        ...(isLive
+          ? {}
+          : {
+              position: "absolute",
+              width: 0,
+              height: 0,
+              top: 0,
+              left: 0,
+            }),
         // by default, iframes will eat pointer events, which can cause issues during drag
         pointerEvents: dragInteractionInProgress ? "none" : undefined,
       }}

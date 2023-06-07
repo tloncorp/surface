@@ -1,18 +1,15 @@
 import useInstalledApps from "@/useInstalledApps";
 import { useCallback } from "react";
-import {
-  getAppHref,
-  normalizeUrbitColor,
-} from "../../../../landscape/ui/src/state/util";
+import { getAppHref, normalizeUrbitColor } from "@/util";
 import { TabContentConfig } from "../types";
 
 const NewTabPicker = ({
   isOpen,
-  onTabPicked,
+  onTabSelected,
   onClose,
 }: {
   isOpen: boolean;
-  onTabPicked: (pane: TabContentConfig) => void;
+  onTabSelected: (pane: TabContentConfig) => void;
   onClose: () => void;
 }) => {
   const apps = useInstalledApps();
@@ -32,7 +29,7 @@ const NewTabPicker = ({
               style={styles.appListItem}
               key={app.title}
               onClick={() =>
-                onTabPicked({
+                onTabSelected({
                   title: app.title,
                   path: getAppHref(app.href),
                 })

@@ -53,22 +53,22 @@ const TabList = ({
         direction="horizontal"
         isCombineEnabled={true}
       >
-        {({ placeholder, innerRef, droppableProps }) => {
+        {({ placeholder: dragPlaceholder, innerRef, droppableProps }) => {
           return (
             <nav {...droppableProps} ref={innerRef} style={styles.container}>
-              {tabs.map((tab, index) => {
-                return (
-                  <Tab
-                    tab={tab}
-                    index={index}
-                    isActive={tab.id === activeTab}
-                    onPressClose={onTabClosed}
-                    onPress={onTabSelected}
-                    onPressSplit={onTabSplit}
-                  />
-                );
-              })}
-              {placeholder}
+              {tabs.map((tab, index) => (
+                <Tab
+                  tab={tab}
+                  index={index}
+                  isActive={tab.id === activeTab}
+                  onPressClose={onTabClosed}
+                  onPress={onTabSelected}
+                  onPressSplit={onTabSplit}
+                />
+              ))}
+
+              {dragPlaceholder}
+
               <button style={styles.addTabButton} onClick={onNewTabPressed}>
                 Open App
               </button>
