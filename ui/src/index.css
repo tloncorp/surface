@@ -1,5 +1,5 @@
 :root {
-  font-family: monospace;
+  font-family: Inter, sans-serif, monospace;
   font-size: 12px;
   line-height: 1.5;
   font-weight: 400;
@@ -9,6 +9,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+  color: #333;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
