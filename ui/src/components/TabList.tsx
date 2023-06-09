@@ -1,12 +1,11 @@
-import { CSSProperties, useCallback } from "react";
+import { CSSProperties, useCallback } from 'react';
 import {
   DragDropContext,
   Droppable,
-  OnDragEndResponder,
-} from "react-beautiful-dnd";
-import Tab from "./Tab";
-import tabStyle from "../styles";
-import { TabConfig } from "../types";
+  OnDragEndResponder
+} from 'react-beautiful-dnd';
+import Tab from './Tab';
+import { TabConfig } from '../types';
 
 const TabList = ({
   tabs,
@@ -16,7 +15,7 @@ const TabList = ({
   onTabMoved,
   onTabsCombined,
   onTabSplit,
-  onNewTabPressed,
+  onNewTabPressed
 }: {
   tabs: TabConfig[];
   activeTab: string | null;
@@ -28,7 +27,7 @@ const TabList = ({
   onTabSplit: (tab: TabConfig) => void;
 }) => {
   const handleDragEnd: OnDragEndResponder = useCallback(
-    (result) => {
+    result => {
       if (result.combine) {
         onTabsCombined(result.draggableId, result.combine.draggableId);
         return;
@@ -38,7 +37,7 @@ const TabList = ({
       if (
         sourceIndex !== destinationIndex &&
         destinationIndex !== null &&
-        typeof destinationIndex !== "undefined"
+        typeof destinationIndex !== 'undefined'
       ) {
         onTabMoved(sourceIndex, destinationIndex);
       }
@@ -55,7 +54,11 @@ const TabList = ({
       >
         {({ placeholder: dragPlaceholder, innerRef, droppableProps }) => {
           return (
-            <nav {...droppableProps} ref={innerRef} style={styles.container}>
+            <nav
+              {...droppableProps}
+              ref={innerRef}
+              className="flex w-full flex-row gap-2 bg-gray-100 p-2"
+            >
               {tabs.map((tab, index) => (
                 <Tab
                   tab={tab}
@@ -64,12 +67,16 @@ const TabList = ({
                   onPressClose={onTabClosed}
                   onPress={onTabSelected}
                   onPressSplit={onTabSplit}
+                  key={tab.id}
                 />
               ))}
 
               {dragPlaceholder}
 
-              <button style={styles.addTabButton} onClick={onNewTabPressed}>
+              <button
+                className="flex items-center justify-center bg-transparent text-gray-600 ml-2"
+                onClick={onNewTabPressed}
+              >
                 Open App
               </button>
             </nav>
@@ -78,24 +85,6 @@ const TabList = ({
       </Droppable>
     </DragDropContext>
   );
-};
-
-const styles: Record<string, CSSProperties> = {
-  container: {
-    display: "flex",
-    flexDirection: "row",
-    padding: 8,
-    gap: 8,
-    background: "#E5E5E5",
-    width: "100%",
-  },
-  addTabButton: {
-    ...tabStyle,
-    background: "transparent",
-    border: 0,
-    outline: 0,
-    color: "#666",
-  },
 };
 
 export default TabList;

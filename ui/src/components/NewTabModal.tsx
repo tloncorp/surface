@@ -1,12 +1,12 @@
-import useInstalledApps from "@/useInstalledApps";
-import { useCallback } from "react";
-import { getAppHref, normalizeUrbitColor } from "@/util";
-import { TabContentConfig } from "../types";
+import useInstalledApps from '@/useInstalledApps';
+import { useCallback } from 'react';
+import { getAppHref, normalizeUrbitColor } from '@/util';
+import { TabContentConfig } from '../types';
 
 const NewTabPicker = ({
   isOpen,
   onTabSelected,
-  onClose,
+  onClose
 }: {
   isOpen: boolean;
   onTabSelected: (pane: TabContentConfig) => void;
@@ -21,25 +21,28 @@ const NewTabPicker = ({
   if (!isOpen) return null;
 
   return (
-    <div style={styles.container} onClick={handleBackdropClicked}>
-      <ul style={styles.content}>
-        {apps.map((app) => {
+    <div
+      className="fixed bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center p-4"
+      onClick={handleBackdropClicked}
+    >
+      <ul className="w-[300px] rounded-lg bg-white p-2 shadow-xl">
+        {apps.map(app => {
           return (
             <div
-              style={styles.appListItem}
+              className="flex cursor-pointer items-center gap-3 p-2"
               key={app.title}
               onClick={() =>
                 onTabSelected({
                   title: app.title,
-                  path: getAppHref(app.href),
+                  path: getAppHref(app.href)
                 })
               }
             >
               <div
                 style={{
-                  ...styles.iconBox,
-                  backgroundColor: normalizeUrbitColor(app.color),
+                  backgroundColor: normalizeUrbitColor(app.color)
                 }}
+                className="h-6 w-6 rounded"
               ></div>
               {app.title}
             </div>
@@ -51,38 +54,3 @@ const NewTabPicker = ({
 };
 
 export default NewTabPicker;
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    bottom: 0,
-    right: 0,
-    padding: "16px",
-    textAlign: "left",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    width: 300,
-    backgroundColor: "white",
-    borderRadius: 8,
-    boxShadow: "0 4px 16px rgba(0,0,0,.2)",
-    padding: 8,
-  },
-  iconBox: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-  },
-  appListItem: {
-    cursor: "pointer",
-    padding: 8,
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-};
