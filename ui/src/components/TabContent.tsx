@@ -1,12 +1,13 @@
-import React, { useContext, useEffect } from "react";
-import { InteractionContext } from "./InteractionContext";
+import React, { useContext, useEffect } from 'react';
+import cn from 'classnames';
+import { InteractionContext } from './InteractionContext';
 
 /**
  * Responsible for rendering an app in an iframe.
  */
 const TabContent = ({
   config,
-  isLive,
+  isLive
 }: {
   config: { path: string };
   /**
@@ -37,44 +38,20 @@ const TabContent = ({
   return shouldRender ? (
     <div
       style={{
-        ...styles.container,
-        ...(isLive
-          ? {}
-          : {
-              position: "absolute",
-              width: 0,
-              height: 0,
-              top: 0,
-              left: 0,
-            }),
         // by default, iframes will eat pointer events, which can cause issues during drag
-        pointerEvents: dragInteractionInProgress ? "none" : undefined,
+        pointerEvents: dragInteractionInProgress ? 'none' : undefined
       }}
+      className={cn('flex h-full w-full flex-col overflow-hidden rounded-lg', {
+        'absolute left-0 top-0': !isLive,
+        relative: isLive
+      })}
     >
-      <iframe style={styles.iframe} src={config.path} />
+      <iframe
+        className="min-h-0 flex-1 overflow-hidden rounded-lg border-0 bg-white shadow-md"
+        src={config.path}
+      />
     </div>
   ) : null;
 };
 
 export default TabContent;
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    height: "100%",
-    width: "100%",
-    position: "relative",
-    display: "flex",
-    flexDirection: "column",
-    borderRadius: 8,
-    overflow: "hidden",
-  },
-  iframe: {
-    flex: 1,
-    border: 0,
-    backgroundColor: "white",
-    borderRadius: 8,
-    overflow: "hidden",
-    minHeight: 0,
-    boxShadow: "0 0 5px rgba(0,0,0,.1)",
-  },
-};

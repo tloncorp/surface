@@ -1,7 +1,7 @@
-import { MouseEventHandler, useCallback } from "react";
-import { Draggable } from "react-beautiful-dnd";
-import tabStyle from "../styles";
-import { TabConfig } from "../types";
+import { MouseEventHandler, useCallback } from 'react';
+import { Draggable } from 'react-beautiful-dnd';
+import cn from 'classnames';
+import { TabConfig } from '../types';
 
 const Tab = ({
   tab,
@@ -9,7 +9,7 @@ const Tab = ({
   onPress,
   onPressClose,
   onPressSplit,
-  isActive,
+  isActive
 }: {
   tab: TabConfig;
   index: number;
@@ -27,7 +27,7 @@ const Tab = ({
   }, [onPressClose, tab]);
 
   const handlePressSplit: MouseEventHandler = useCallback(
-    (e) => {
+    e => {
       e.preventDefault();
       e.stopPropagation();
       onPressSplit?.(tab);
@@ -47,18 +47,27 @@ const Tab = ({
             ref={innerRef}
           >
             <div
-              style={{
-                ...tabStyles.tab,
-                backgroundColor: isActive ? "#FFF" : "#d5d5d5",
-              }}
+              className={cn(
+                'flex h-9 min-w-[100px] items-center justify-between gap-2 rounded-md p-2',
+                {
+                  'bg-white': isActive,
+                  'bg-gray-200': !isActive
+                }
+              )}
             >
-              <span>{tab.panes.map((p) => p.title).join(" + ")}</span>
+              <span>{tab.panes.map(p => p.title).join(' + ')}</span>
               {tab.panes.length > 1 && (
-                <a style={tabStyles.splitButton} onClick={handlePressSplit}>
+                <a
+                  className="rounded bg-gray-100 px-2 py-1 text-xs uppercase underline"
+                  onClick={handlePressSplit}
+                >
                   Split
                 </a>
               )}
-              <a style={tabStyles.closeButton} onClick={handlePressClose}>
+              <a
+                className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 text-sm uppercase underline"
+                onClick={handlePressClose}
+              >
                 &times;
               </a>
             </div>
@@ -67,33 +76,6 @@ const Tab = ({
       }}
     </Draggable>
   );
-};
-
-const tabStyles: Record<string, React.CSSProperties> = {
-  tab: { ...tabStyle },
-  splitButton: {
-    display: "block",
-    fontSize: 10,
-    padding: "3px 4px 2px",
-    borderRadius: 4,
-    textTransform: "uppercase",
-    backgroundColor: `rgba(0,0,0,.1)`,
-  },
-  closeButton: {
-    display: "block",
-    fontSize: 12,
-    textTransform: "uppercase",
-    backgroundColor: `rgba(0,0,0,.1)`,
-    aspectRatio: 1,
-    width: 16,
-    height: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: "50%",
-    textAlign: "center",
-    padding: "0 0 2px",
-    lineHeight: 1.3,
-  },
 };
 
 export default Tab;
