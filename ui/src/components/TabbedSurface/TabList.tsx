@@ -4,9 +4,9 @@ import {
   Droppable,
   OnDragEndResponder
 } from 'react-beautiful-dnd';
-import Tab from '@/components/Tab';
+import Tab from '@/components/TabbedSurface/Tab';
 import { TabConfig } from '@/types';
-import MagnifyingGlassIcon from './icons/MagnifyingGlassIcon';
+import MagnifyingGlassIcon from '@/components/icons/MagnifyingGlassIcon';
 import OpenAppIcon from '@/components/icons/OpenAppIcon';
 import CaretDownIcon from '@/components/icons/CaretDownIcon';
 import CompassIcon from '@/components/icons/CompassIcon';
@@ -21,7 +21,7 @@ const TabList = ({
   onTabMoved,
   onTabsCombined,
   onTabSplit,
-  onNewTabPressed
+  onNewTabPressed,
 }: {
   tabs: TabConfig[];
   activeTab: string | null;
@@ -33,7 +33,7 @@ const TabList = ({
   onTabSplit: (tab: TabConfig) => void;
 }) => {
   const handleDragEnd: OnDragEndResponder = useCallback(
-    result => {
+    (result) => {
       if (result.combine) {
         onTabsCombined(result.draggableId, result.combine.draggableId);
         return;
@@ -43,7 +43,7 @@ const TabList = ({
       if (
         sourceIndex !== destinationIndex &&
         destinationIndex !== null &&
-        typeof destinationIndex !== 'undefined'
+        typeof destinationIndex !== "undefined"
       ) {
         onTabMoved(sourceIndex, destinationIndex);
       }

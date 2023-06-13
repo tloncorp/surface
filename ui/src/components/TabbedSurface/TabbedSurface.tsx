@@ -1,10 +1,10 @@
-import { getQueryParam, setQueryParam } from '../util';
+import { getQueryParam, setQueryParam } from '@/util';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { TabConfig } from '@/types';
 import useSyncedStorage from '@/useSyncedStorage';
-import NewTabModal from '@/components/NewTabModal';
-import TabContent from '@/components/TabContent';
-import TabList from '@/components/TabList';
+import NewTabModal from '@/components/TabbedSurface/NewTabModal';
+import TabContent from '@/components/TabbedSurface/TabContent';
+import TabList from '@/components/TabbedSurface/TabList';
 
 const TabbedSurface = () => {
   const {
@@ -15,12 +15,15 @@ const TabbedSurface = () => {
     removeTab,
     combineTabs,
     splitTab,
-    moveTab
+    moveTab,
   } = useTabs();
 
   const [showNewTabPicker, setShowNewTabPicker] = useState(false);
 
-  const handlePressAddTab = useCallback(() => setShowNewTabPicker(p => !p), []);
+  const handlePressAddTab = useCallback(
+    () => setShowNewTabPicker((p) => !p),
+    []
+  );
 
   const handleNewTabPickerClosed = useCallback(
     () => setShowNewTabPicker(false),
@@ -82,13 +85,13 @@ const TabbedSurface = () => {
         onTabsCombined={handleTabsCombined}
       />
       <div className="relative flex h-full w-full flex-1 flex-col">
-        {tabContent.map(tab => {
+        {tabContent.map((tab) => {
           return (
             <div
               key={tab.id}
               className="absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0"
             >
-              {tab.panes.map(pane => (
+              {tab.panes.map((pane) => (
                 <TabContent
                   config={{ path: pane.path }}
                   isLive={tab.id === activeTab}
@@ -110,14 +113,14 @@ const TabbedSurface = () => {
 };
 
 const useTabs = () => {
-  const [tabs, setTabs] = useSyncedStorage<TabConfig[]>('tabs', []);
+  const [tabs, setTabs] = useSyncedStorage<TabConfig[]>("tabs", []);
   const [activeTab, setActiveTab] = useState<string | null>(() => {
-    return getQueryParam('tab') ?? tabs[0]?.id ?? null;
+    return getQueryParam("tab") ?? tabs[0]?.id ?? null;
   });
 
   // Persist active tab to query param when it changes
   useEffect(() => {
-    setQueryParam('tab', activeTab);
+    setQueryParam("tab", activeTab);
   }, [activeTab]);
 
   const tabIndexes = useMemo(() => {
@@ -139,7 +142,7 @@ const useTabs = () => {
     (id: string) => {
       const index = tabIndexes?.[id] ?? -1;
       if (index === -1) {
-        console.warn('attempted to remove non-existent tab', id);
+        console.warn("attempted to remove non-existent tab", id);
         return;
       }
       const newTabs = [...tabs];
@@ -165,19 +168,19 @@ const useTabs = () => {
       const draggedTab = tabs[draggedIndex];
       const dropTargetTab = tabs[dropTargetIndex];
       if (draggedIndex === -1) {
-        console.warn('attempted to combine non-existent tab', draggedId);
+        console.warn("attempted to combine non-existent tab", draggedId);
         return;
       }
       if (dropTargetIndex === -1) {
-        console.warn('attempted to combine non-existent tab', dropTargetId);
+        console.warn("attempted to combine non-existent tab", dropTargetId);
         return;
       }
       const newTab = {
         id: draggedTab.id,
         addedAt: draggedTab.addedAt,
-        panes: [...dropTargetTab.panes, ...draggedTab.panes]
+        panes: [...dropTargetTab.panes, ...draggedTab.panes],
       };
-      const newTabs = tabs.flatMap(tab => {
+      const newTabs = tabs.flatMap((tab) => {
         if (tab.id === draggedId) {
           return [];
         } else if (tab.id === dropTargetId) {
@@ -196,15 +199,15 @@ const useTabs = () => {
     (id: string) => {
       const index = tabIndexes?.[id] ?? -1;
       if (index === -1) {
-        console.warn('attempted to split non-existent tab', id);
+        console.warn("attempted to split non-existent tab", id);
         return;
       }
       const tab = tabs[index];
       const splitTabs = tab.panes.map((pane, i) => {
         return {
-          id: tab.id + '-' + i,
+          id: tab.id + "-" + i,
           addedAt: tab.addedAt + i,
-          panes: [pane]
+          panes: [pane],
         };
       });
       const newTabs = [...tabs];
@@ -235,7 +238,7 @@ const useTabs = () => {
     removeTab,
     combineTabs,
     splitTab,
-    moveTab
+    moveTab,
   };
 };
 

@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { getAppHref, normalizeUrbitColor } from '@/logic/utils';
 import { TabContentConfig } from '@/types';
-import { useCharges, useInstalledApps } from '@/state/docket';
+import { useInstalledApps } from '@/state/docket';
 
-const NewTabPicker = ({
+const NewTabModal = ({
   isOpen,
   onTabSelected,
   onClose
@@ -53,4 +53,4 @@ const NewTabPicker = ({
   );
 };
 
-export default NewTabPicker;
+export default NewTabModal;

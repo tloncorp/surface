@@ -1,7 +1,7 @@
-import { MouseEventHandler, useCallback } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
-import cn from 'classnames';
-import { TabConfig } from '../types';
+import { MouseEventHandler, useCallback } from "react";
+import { Draggable } from "react-beautiful-dnd";
+import cn from "classnames";
+import { TabConfig } from "../../types";
 
 const Tab = ({
   tab,
@@ -9,7 +9,7 @@ const Tab = ({
   onPress,
   onPressClose,
   onPressSplit,
-  isActive
+  isActive,
 }: {
   tab: TabConfig;
   index: number;
@@ -27,7 +27,7 @@ const Tab = ({
   }, [onPressClose, tab]);
 
   const handlePressSplit: MouseEventHandler = useCallback(
-    e => {
+    (e) => {
       e.preventDefault();
       e.stopPropagation();
       onPressSplit?.(tab);
@@ -55,7 +55,7 @@ const Tab = ({
                 }
               )}
             >
-              <span>{tab.panes.map(p => p.title).join(' + ')}</span>
+              <span>{tab.panes.map((p) => p.title).join(" + ")}</span>
               {tab.panes.length > 1 && (
                 <a
                   className="rounded bg-gray-100 px-2 py-1 text-xs uppercase underline"
