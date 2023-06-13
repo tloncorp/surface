@@ -1,11 +1,11 @@
-import { CSSProperties, useCallback } from 'react';
+import { useCallback } from "react";
 import {
-  DragDropContext,
-  Droppable,
-  OnDragEndResponder
-} from 'react-beautiful-dnd';
-import Tab from './Tab';
-import { TabConfig } from '../types';
+    DragDropContext,
+    Droppable,
+    OnDragEndResponder,
+} from "react-beautiful-dnd";
+import { TabConfig } from "../../types";
+import Tab from "./Tab";
 
 const TabList = ({
   tabs,
@@ -15,7 +15,7 @@ const TabList = ({
   onTabMoved,
   onTabsCombined,
   onTabSplit,
-  onNewTabPressed
+  onNewTabPressed,
 }: {
   tabs: TabConfig[];
   activeTab: string | null;
@@ -27,7 +27,7 @@ const TabList = ({
   onTabSplit: (tab: TabConfig) => void;
 }) => {
   const handleDragEnd: OnDragEndResponder = useCallback(
-    result => {
+    (result) => {
       if (result.combine) {
         onTabsCombined(result.draggableId, result.combine.draggableId);
         return;
@@ -37,7 +37,7 @@ const TabList = ({
       if (
         sourceIndex !== destinationIndex &&
         destinationIndex !== null &&
-        typeof destinationIndex !== 'undefined'
+        typeof destinationIndex !== "undefined"
       ) {
         onTabMoved(sourceIndex, destinationIndex);
       }
@@ -74,7 +74,7 @@ const TabList = ({
               {dragPlaceholder}
 
               <button
-                className="flex items-center justify-center bg-transparent text-gray-600 ml-2"
+                className="ml-2 flex items-center justify-center bg-transparent text-gray-600"
                 onClick={onNewTabPressed}
               >
                 Open App

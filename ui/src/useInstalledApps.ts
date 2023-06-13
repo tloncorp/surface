@@ -14,13 +14,20 @@ const filteredApps = ["garden", "surface", "landscape"];
 
 const useInstalledApps = () => {
   const { data } = useQuery("apps", getInstalledApps);
-  return useMemo(
-    () =>
-      Object.entries(data?.initial ?? {})
+  return useMemo(() => {
+    return [
+      {
+        title: "Dash",
+        color: "0x0",
+        href: {
+          site: "/apps/surface/dash",
+        },
+      },
+      ...Object.entries(data?.initial ?? {})
         .filter(([slug]) => !filteredApps.includes(slug))
         .map(([, app]) => app),
-    [data]
-  );
+    ];
+  }, [data]);
 };
 
 export default useInstalledApps;

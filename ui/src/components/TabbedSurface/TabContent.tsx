@@ -1,13 +1,13 @@
-import React, { useContext, useEffect } from 'react';
-import cn from 'classnames';
-import { InteractionContext } from './InteractionContext';
+import { InteractionContext } from "@/components/InteractionContext";
+import cn from "classnames";
+import React, { useContext, useEffect } from "react";
 
 /**
  * Responsible for rendering an app in an iframe.
  */
 const TabContent = ({
   config,
-  isLive
+  isLive,
 }: {
   config: { path: string };
   /**
@@ -39,11 +39,11 @@ const TabContent = ({
     <div
       style={{
         // by default, iframes will eat pointer events, which can cause issues during drag
-        pointerEvents: dragInteractionInProgress ? 'none' : undefined
+        pointerEvents: dragInteractionInProgress ? "none" : undefined,
       }}
-      className={cn('flex h-full w-full flex-col overflow-hidden rounded-lg', {
-        'absolute left-0 top-0': !isLive,
-        relative: isLive
+      className={cn("flex h-full w-full flex-col overflow-hidden rounded-lg", {
+        "absolute left-0 top-0": !isLive,
+        relative: isLive,
       })}
     >
       <iframe
