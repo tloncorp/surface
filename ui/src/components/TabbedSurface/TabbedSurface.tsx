@@ -73,7 +73,7 @@ const TabbedSurface = () => {
   );
 
   return (
-    <div className="bg-ray-100 flex h-full w-full flex-1 flex-col">
+    <div className="bg-gray-100 flex h-full w-full flex-1 flex-col">
       <TabList
         tabs={tabs}
         activeTab={activeTab}
