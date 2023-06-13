@@ -48,10 +48,10 @@ const Tab = ({
           >
             <div
               className={cn(
-                'flex h-9 min-w-[100px] items-center justify-between gap-2 rounded-md p-2',
+                'flex min-w-[100px] items-center justify-between gap-2 rounded-md p-2',
                 {
-                  'bg-white': isActive,
-                  'bg-gray-200': !isActive
+                  'bg-white/80': isActive,
+                  'bg-white/40': !isActive
                 }
               )}
             >

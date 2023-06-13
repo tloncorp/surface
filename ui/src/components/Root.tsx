@@ -1,16 +1,18 @@
-import { useMemo } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { InteractionContextProvider } from "./InteractionContext";
-import TabbedSurface from "./TabbedSurface";
+import { InteractionContextProvider } from '@/components/InteractionContext';
+import TabbedSurface from '@/components/TabbedSurface';
+import bootstrap from '@/state/bootstrap';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { useEffect } from 'react';
 
 function Root() {
-  const queryClient = useMemo(() => new QueryClient(), []);
+  useEffect(() => {
+    bootstrap();
+  }, []);
 
   return (
     <InteractionContextProvider>
-      <QueryClientProvider client={queryClient}>
-        <TabbedSurface />
-      </QueryClientProvider>
+      <ReactQueryDevtools initialIsOpen={false} />
+      <TabbedSurface />
     </InteractionContextProvider>
   );
 }

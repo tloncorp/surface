@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react';
 import cn from 'classnames';
-import { InteractionContext } from './InteractionContext';
+import { InteractionContext } from '@/components/InteractionContext';
 
 /**
  * Responsible for rendering an app in an iframe.

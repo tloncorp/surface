@@ -1,12 +1,7 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ESNext",
-      "WebWorker"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ESNext", "WebWorker"],
     "allowJs": false,
     "skipLibCheck": true,
     "esModuleInterop": false,
@@ -19,19 +14,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": [
-      "vite/client",
-    ],
+    "types": ["vite/client"],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@urbit/api": ["./node_modules/@urbit/api/dist/api/index.d.ts"]
     }
   },
-  "include": [
-    "./src",
-    "./e2e",
-    "./*.config.ts",
-    "./*.setup.ts"
-  ]
+  "include": ["./src", "./e2e", "./*.config.ts", "./*.setup.ts"]
 }

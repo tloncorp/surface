@@ -1,7 +1,7 @@
-import useInstalledApps from '@/useInstalledApps';
 import { useCallback } from 'react';
-import { getAppHref, normalizeUrbitColor } from '@/util';
-import { TabContentConfig } from '../types';
+import { getAppHref, normalizeUrbitColor } from '@/logic/utils';
+import { TabContentConfig } from '@/types';
+import { useCharges, useInstalledApps } from '@/state/docket';
 
 const NewTabPicker = ({
   isOpen,
