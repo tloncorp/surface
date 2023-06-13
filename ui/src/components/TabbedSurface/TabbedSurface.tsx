@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { TabConfig } from "../../types";
-import useSyncedStorage from "../../useSyncedStorage";
-import { getQueryParam, setQueryParam } from "../../util";
-import NewTabModal from "./NewTabModal";
-import TabContent from "./TabContent";
-import TabList from "./TabList";
+import { getQueryParam, setQueryParam } from '@/util';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { TabConfig } from '@/types';
+import useSyncedStorage from '@/useSyncedStorage';
+import NewTabModal from '@/components/TabbedSurface/NewTabModal';
+import TabContent from '@/components/TabbedSurface/TabContent';
+import TabList from '@/components/TabbedSurface/TabList';
 
 const TabbedSurface = () => {
   const {
@@ -73,7 +73,7 @@ const TabbedSurface = () => {
   );
 
   return (
-    <div className="bg-gray-100 flex h-full w-full flex-1 flex-col">
+    <div className="flex h-full w-full flex-1 flex-col bg-gray-100">
       <TabList
         tabs={tabs}
         activeTab={activeTab}

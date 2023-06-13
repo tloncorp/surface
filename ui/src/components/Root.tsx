@@ -1,29 +1,32 @@
-import { useMemo } from "react";
-import { QueryClient, QueryClientProvider } from "react-query";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
-import { InteractionContextProvider } from "./InteractionContext";
-import TabbedSurface from "./TabbedSurface";
-import WidgetGrid from "./WidgetSurface/WidgetGrid";
+import { useEffect } from 'react';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { InteractionContextProvider } from './InteractionContext';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import TabbedSurface from './TabbedSurface';
+import WidgetGrid from './WidgetSurface/WidgetGrid';
+import bootstrap from '@/state/bootstrap';
 
 const AppRoutes = () => {
   return (
     <Switch>
       <Route path="/dash" component={WidgetGrid} />
-      <Route path={"/"} component={TabbedSurface} />
+      <Route path={'/'} component={TabbedSurface} />
     </Switch>
   );
 };
 
 function Root() {
-  const queryClient = useMemo(() => new QueryClient(), []);
-  const base = "/apps/surface";
+  const base = '/apps/surface';
+
+  useEffect(() => {
+    bootstrap();
+  }, []);
 
   return (
     <BrowserRouter basename={base}>
       <InteractionContextProvider>
-        <QueryClientProvider client={queryClient}>
-          <AppRoutes />
-        </QueryClientProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
+        <AppRoutes />
       </InteractionContextProvider>
     </BrowserRouter>
   );

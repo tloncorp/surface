@@ -1,187 +1,283 @@
-import { decToUd, deSig, preSig } from "@urbit/api";
-import { Pikes } from "@urbit/api/dist/api";
-import { Patp } from "@urbit/http-api";
-import {
-  ChatPerm,
-  ChatWrits,
-  Club,
-  Clubs,
-  Pins,
-} from "../../../landscape-apps/ui/src/types/chat";
-import {
-  Contact,
-  ContactRolodex,
-} from "../../../landscape-apps/ui/src/types/contact";
-import {
-  Gangs,
-  Group,
-  Groups,
-} from "../../../landscape-apps/ui/src/types/groups";
-import { Blanket, Carpet } from "../../../landscape-apps/ui/src/types/hark";
-import urbit from "./urbit";
+import type UrbitMock from '@tloncorp/mock-http-api';
+import UrbitBase, {
+  Message,
+  Poke,
+  PokeInterface,
+  Scry,
+  SubscriptionRequestInterface,
+  Thread,
+  UrbitHttpApiEvent,
+  UrbitHttpApiEventType,
+} from '@urbit/http-api';
+import _ from 'lodash';
+import { useLocalState } from '@/state/local';
+import useSchedulerStore from './state/scheduler';
+import { actionDrill } from './logic/utils';
 
-export const getInstalledApps = async () => {
-  return await urbit.scry<Pikes>({
-    app: "docket",
-    path: "/charges",
-  });
-};
+export const IS_MOCK =
+  import.meta.env.MODE === 'mock' || import.meta.env.MODE === 'staging';
+const URL = (import.meta.env.VITE_MOCK_URL ||
+  import.meta.env.VITE_VERCEL_URL) as string;
 
-export const getPinnedChats = async () => {
-  return await urbit.scry<Pins>({
-    app: "chat",
-    path: "/pins",
-  });
-};
+type Hook = (event: any, mark: string) => boolean;
 
-export const getChatPermissions = async (chatId: string) => {
-  return await urbit.scry<ChatPerm>({
-    app: "chat",
-    path: `/chat/${chatId}/perm`,
-  });
-};
-
-export const getChats = async () => {
-  return await urbit.scry<Clubs>({
-    app: "chat",
-    path: "/dms",
-  });
-};
-
-// export const getChatMessages = async (shipId: Patp, count: number) => {
-//   return await urbit.scry<Clubs>({
-//     app: "chat",
-//     path: `/dm/${shipId}/writs/newest/${count}.json`,
-//   });
-// };
-
-export const getGroupChats = async () => {
-  return await urbit.scry<Clubs>({
-    app: "chat",
-    path: "/clubs",
-  });
-};
-
-export const getGroupChat = async (groupChatId: string) => {
-  return await urbit.scry<Club>({
-    app: "chat",
-    path: `/club/${groupChatId}/crew`,
-  });
-};
-
-export const getGroupMetas = async () => {
-  return await urbit.scry<Gangs>({
-    app: "groups",
-    path: "/gangs",
-  });
-};
-
-export const getGroups = async () => {
-  return await urbit.scry<Groups>({
-    app: "groups",
-    path: "/groups",
-  });
-};
-
-export const getGroupMeta = async (groupId: string) => {
-  return await urbit.scry<Gangs>({
-    app: "groups",
-    path: `/gangs/${groupId}`,
-  });
-};
-
-export const getGroup = async (groupId: string) => {
-  return await urbit.scry<Group>({
-    app: "groups",
-    path: `/groups/${groupId}`,
-  });
-};
-
-export const getGroupMembers = async (groupId: string) => {
-  return await urbit.scry<Group>({
-    app: "groups",
-    path: `/groups/${groupId}/fleet/ships`,
-  });
-};
-
-export const getContacts = async () => {
-  return await urbit.scry<ContactRolodex>({
-    app: "contacts",
-    path: "/all",
-  });
-};
-
-export const getContact = async (ship: string) => {
-  return await urbit.scry<Contact>({
-    app: "contacts",
-    path: `/contact/${preSig(ship)}`,
-  });
-};
-
-export const getNotifications = async () => {
-  const carpet = await urbit.scry<Carpet>({
-    app: "hark",
-    path: `/all/latest`,
-  });
-  return await urbit.scry<Blanket>({
-    app: "hark",
-    path: `/all/quilt/${decToUd(carpet.stitch.toString())}`,
-  });
-};
-
-export interface Peer {
-  known?: {
-    life: number;
-    qos: { "last-contact": number; kind: string };
-    scries: [];
-    route: { lane: string; direct: boolean };
-    nax: [];
-    rift: number;
-    heeds: string[][];
-    flows: { backward: []; forward: [] };
-  };
-  alien?: {
-    keens: [];
-    messages: number;
-    packets: number;
-    heeds: string[][];
-  };
+interface Watcher {
+  id: string;
+  hook: Hook;
+  resolve: (value: void | PromiseLike<void>) => void;
+  reject: (reason?: any) => void;
 }
 
-export const getPeers = async (): Promise<{
-  known: Patp[];
-  unknown: Patp[];
-}> => {
-  return await fetch("/~debug/ames/peer.json").then((res) => res.json());
-};
+interface SubscriptionId {
+  app: string;
+  path: string;
+}
 
-export const getPeer = async (peer: string): Promise<Peer> => {
-  return await fetch(`/~debug/ames/peer/${deSig(peer)}.json`).then((res) =>
-    res.json()
-  );
-};
+function subPath(id: SubscriptionId) {
+  return `${id.app}${id.path}`;
+}
 
-export const getChatMessages = ({
-  type,
-  conversation,
-  count,
-}: {
-  type: "dm" | "club" | "chat";
-  conversation: string;
-  count: number;
-}) => {
-  return urbit.scry<ChatWrits>({
-    app: "chat",
-    path: `/${type}/${conversation}/writs/newest/${count}`,
-  });
-};
+type EyrePayload = (Message &
+  (Poke<any> | Thread<any> | SubscriptionRequestInterface | Scry))[];
 
-export const subscribeToChatUpdates = () => {
-  return urbit.subscribe({
-    app: "chat",
-    path: "/briefs",
-    event: (data, mark) => {
-      console.log(data, mark);
-    },
-  });
-};
+function hostingUrl(url: string, messages: EyrePayload) {
+  const isHosted =
+    import.meta.env.DEV || window.location.hostname.endsWith('.tlon.network');
+
+  if (!isHosted || messages.length !== 1) {
+    return url;
+  }
+
+  const json = messages[0];
+
+  if (json.action === 'poke' && 'mark' in json) {
+    const base = `${url}?mark=${json.mark}`;
+    const actions = json.json ? actionDrill(json.json).join(',') : [];
+    return actions.length > 0 ? `${base}&actions=${actions}` : base;
+  }
+
+  return url;
+}
+
+const Urbit = UrbitBase as new (
+  url: string,
+  code?: string,
+  desk?: string,
+  urlTransformer?: (someUrl: string, json: EyrePayload) => string
+) => UrbitBase;
+
+class API {
+  private client: UrbitBase | UrbitMock | undefined;
+
+  subscriptions: Set<string>;
+
+  subscriptionMap: Map<number, string>;
+
+  watchers: Record<string, Map<string, Watcher>>;
+
+  constructor() {
+    this.subscriptions = new Set();
+    this.subscriptionMap = new Map();
+    this.watchers = {};
+  }
+
+  private async setup() {
+    if (this.client) {
+      return this.client;
+    }
+
+    this.client = new Urbit('', '', window.desk, hostingUrl);
+    this.client.ship = window.ship;
+    this.client.verbose = import.meta.env.DEV;
+
+    (this.client as UrbitBase).onReconnect = () => {
+      const { onReconnect } = useLocalState.getState();
+      if (onReconnect) {
+        onReconnect();
+      }
+      useLocalState.setState((state) => ({
+        subscription: 'connected',
+      }));
+    };
+
+    this.client.onRetry = () => {
+      useLocalState.setState((state) => ({
+        subscription: 'reconnecting',
+        errorCount: state.errorCount + 1,
+      }));
+    };
+
+    this.client.onError = () => {
+      (async () => {
+        useLocalState.setState((state) => ({
+          airLockErrorCount: state.airLockErrorCount + 1,
+          subscription: 'disconnected',
+        }));
+      })();
+    };
+
+    return this.client;
+  }
+
+  private async withClient<T>(cb: (client: UrbitBase | UrbitMock) => T) {
+    if (!this.client) {
+      const client = await this.setup();
+      return cb(client);
+    }
+
+    return cb(this.client);
+  }
+
+  private async withErrorHandling<T>(
+    cb: (client: UrbitBase | UrbitMock) => Promise<T>
+  ) {
+    try {
+      const result = await this.withClient(cb);
+      useLocalState.setState({ subscription: 'connected', errorCount: 0 });
+
+      return result;
+    } catch (e) {
+      useLocalState.setState((state) => ({ errorCount: state.errorCount + 1 }));
+      throw e;
+    }
+  }
+
+  async scry<T>(params: Scry) {
+    return this.withClient((client) => client.scry<T>(params));
+  }
+
+  async poke<T>(params: PokeInterface<T>) {
+    return this.withErrorHandling((client) => client.poke<T>(params));
+  }
+
+  private async track<R>(
+    subscription: SubscriptionId,
+    hook: (event: R) => boolean
+  ) {
+    const path = subPath(subscription);
+    return new Promise((resolve, reject) => {
+      const subWatchers = this.watchers[path] || new Map();
+      const id = _.uniqueId();
+
+      this.watchers[path] = subWatchers.set(id, {
+        id,
+        hook,
+        resolve,
+        reject,
+      });
+    });
+  }
+
+  async trackedPoke<T, R = T>(
+    params: PokeInterface<T>,
+    subscription: SubscriptionId,
+    validator?: (event: R) => boolean
+  ) {
+    return this.withErrorHandling(
+      (client) =>
+        new Promise<void>((resolve, reject) => {
+          client.poke<T>({
+            ...params,
+            onError: (e) => {
+              params.onError?.(e);
+              reject();
+            },
+            onSuccess: async () => {
+              params.onSuccess?.();
+              const defaultValidator = (event: any) =>
+                _.isEqual(params.json, event);
+              await this.track(subscription, validator || defaultValidator);
+              resolve();
+            },
+          });
+        })
+    );
+  }
+
+  async subscribe(params: SubscriptionRequestInterface, priority = 5) {
+    const subId = subPath(params);
+    if (this.subscriptions.has(subId)) {
+      const [id] = [...this.subscriptionMap.entries()].find(
+        ([k, v]) => v === subId
+      ) || [0, ''];
+      return Promise.resolve(id);
+    }
+
+    this.subscriptions.add(subId);
+
+    const eventListener =
+      (listener?: (event: any, mark: string, id: number) => void) =>
+      (event: any, mark: string, id?: number) => {
+        const path = params.app + params.path;
+        const relevantWatchers = this.watchers[path];
+
+        if (relevantWatchers) {
+          relevantWatchers.forEach((w) => {
+            if (w.hook(event, mark)) {
+              w.resolve();
+              relevantWatchers.delete(w.id);
+            }
+          });
+        }
+
+        if (listener) {
+          listener(event, mark, id || 0);
+        }
+      };
+
+    const id = await useSchedulerStore.getState().wait(
+      () =>
+        this.withErrorHandling((client) =>
+          client.subscribe({
+            ...params,
+            event: eventListener(params.event),
+            quit: () => {
+              this.client!.subscribe({
+                ...params,
+                event: eventListener(params.event),
+              });
+            },
+          })
+        ),
+      priority
+    );
+
+    this.subscriptionMap.set(id, subId);
+    return id;
+  }
+
+  async subscribeOnce<T>(app: string, path: string, timeout?: number) {
+    return this.withErrorHandling(() =>
+      this.client!.subscribeOnce<T>(app, path, timeout)
+    );
+  }
+
+  async thread<Return, T>(params: Thread<T>) {
+    return this.withErrorHandling(() => this.client!.thread<Return, T>(params));
+  }
+
+  async unsubscribe(id: number) {
+    const subId = this.subscriptionMap.get(id);
+    if (subId) {
+      this.subscriptions.delete(subId);
+      this.subscriptionMap.delete(id);
+    }
+
+    return this.withErrorHandling(() => this.client!.unsubscribe(id));
+  }
+
+  reset() {
+    this.withClient((client) => client.reset());
+  }
+
+  on<T extends UrbitHttpApiEventType>(
+    event: T,
+    callback: (data: UrbitHttpApiEvent[T]) => void
+  ) {
+    (this.client as UrbitBase).on(event, callback);
+  }
+}
+
+const api = new API();
+
+export default api;

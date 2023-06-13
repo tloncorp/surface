@@ -1,12 +1,12 @@
-import useInstalledApps from "@/useInstalledApps";
-import { useCallback } from "react";
-import { getAppHref, normalizeUrbitColor } from "@/util";
-import { TabContentConfig } from "../../types";
+import { useCallback } from 'react';
+import { getAppHref, normalizeUrbitColor } from '@/logic/utils';
+import { TabContentConfig } from '@/types';
+import { useInstalledApps } from '@/state/docket';
 
 const NewTabModal = ({
   isOpen,
   onTabSelected,
-  onClose,
+  onClose
 }: {
   isOpen: boolean;
   onTabSelected: (pane: TabContentConfig) => void;
@@ -26,7 +26,7 @@ const NewTabModal = ({
       onClick={handleBackdropClicked}
     >
       <ul className="w-[300px] rounded-lg bg-white p-2 shadow-xl">
-        {apps.map((app) => {
+        {apps.map(app => {
           return (
             <div
               className="flex cursor-pointer items-center gap-3 p-2"
@@ -34,13 +34,13 @@ const NewTabModal = ({
               onClick={() =>
                 onTabSelected({
                   title: app.title,
-                  path: getAppHref(app.href),
+                  path: getAppHref(app.href)
                 })
               }
             >
               <div
                 style={{
-                  backgroundColor: normalizeUrbitColor(app.color),
+                  backgroundColor: normalizeUrbitColor(app.color)
                 }}
                 className="h-6 w-6 rounded"
               ></div>
