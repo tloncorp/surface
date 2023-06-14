@@ -72,7 +72,7 @@ const WidgetGrid = () => {
       },
     };
     setItems((items) => [...items, clockWidget]);
-  }, []);
+  }, [items]);
 
   return (
     <div ref={gridRef} className="flex h-full w-full overflow-hidden">
@@ -87,7 +87,7 @@ const WidgetGrid = () => {
           rowHeight={gridSize}
           compactType={null}
           isDroppable={true}
-          allowOverlap={true}
+          allowOverlap={false}
           preventCollision={false}
           layout={layouts}
         >
