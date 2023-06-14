@@ -1,16 +1,9 @@
-import React, {
-  DragEvent,
-  useCallback,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import ReactGridLayout, { DragOverEvent, Layout } from "react-grid-layout";
+import { Widget as WidgetConfig } from "@/types/surface";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import ReactGridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import WidgetList from "./WidgetList";
-import Widget, { WidgetConfig } from "./Widget";
+import Widget from "./Widget";
 
 const gridSize = 100;
 
@@ -19,13 +12,8 @@ const defaultSize = {
   h: 2,
 };
 
-interface GridItemConfig {
-  layout: Layout;
-  config: WidgetConfig;
-}
-
 const WidgetGrid = () => {
-  const [items, setItems] = useState<GridItemConfig[]>([]);
+  const [items, setItems] = useState<WidgetConfig[]>([]);
   const gridRef = useRef<HTMLDivElement>(null);
 
   const [config, setConfig] = useState<{
@@ -47,31 +35,6 @@ const WidgetGrid = () => {
     });
   }, []);
 
-  const handleDrop = useCallback(
-    (gridLayouts: Layout[], itemLayout: Layout, event: Event) => {
-      // react-grid-layout typing is inaccurate
-      const dragEvent = event as unknown as DragEvent;
-      const rawData = dragEvent.dataTransfer.getData("text/plain");
-      const config = JSON.parse(rawData) as WidgetConfig;
-      setItems((items) => [
-        ...items,
-        {
-          layout: {
-            ...defaultSize,
-            ...itemLayout,
-            i: items.length.toString(),
-          },
-          config,
-        },
-      ]);
-    },
-    []
-  );
-
-  const handleDragOver = useCallback((event: DragOverEvent) => {
-    return { ...defaultSize };
-  }, []);
-
   const handleLayoutChange = useCallback((newLayouts: Layout[]) => {
     setItems((items) => {
       const newItems = items.map((item, i) => {
@@ -87,31 +50,36 @@ const WidgetGrid = () => {
   const { children, layouts } = useMemo(() => {
     return {
       children: items.map((item, i) => {
-        return <GridItem config={item} key={i} />;
+        return <Widget widget={item} key={item.id} />;
       }),
       layouts: items.map((item) => item.layout),
     };
   }, [items]);
 
+  const handlePressAddClock = useCallback(() => {
+    const id = items.length.toString();
+    const clockWidget: WidgetConfig = {
+      id,
+      type: "clock",
+      layout: {
+        ...defaultSize,
+        x: 0,
+        y: 0,
+        i: id,
+      },
+      config: {
+        type: "classic",
+      },
+    };
+    setItems((items) => [...items, clockWidget]);
+  }, [items]);
+
   return (
-    <div
-      ref={gridRef}
-      style={{
-        display: "flex",
-        position: "relative",
-        height: "100vh",
-        overflow: "hidden",
-        flex: 1,
-      }}
-    >
+    <div ref={gridRef} className="flex h-full w-full overflow-hidden">
+      <a onClick={handlePressAddClock}>Add Clock</a>
       {config ? (
         <ReactGridLayout
-          style={{
-            height: "100%",
-            width: "100%",
-          }}
-          onDropDragOver={handleDragOver}
-          onDrop={handleDrop}
+          className="h-full w-full"
           width={config.width}
           margin={[10, 10]}
           cols={config.columns}
@@ -119,49 +87,15 @@ const WidgetGrid = () => {
           rowHeight={gridSize}
           compactType={null}
           isDroppable={true}
-          allowOverlap={true}
+          allowOverlap={false}
           preventCollision={false}
           layout={layouts}
         >
           {children}
         </ReactGridLayout>
       ) : null}
-      <WidgetList />
     </div>
   );
 };
 
 export default WidgetGrid;
-
-const GridItem = React.forwardRef<
-  HTMLDivElement,
-  React.PropsWithChildren<
-    React.HTMLProps<HTMLDivElement> & {
-      config: GridItemConfig;
-      onPressAdd?: () => void;
-      onPressRemove?: () => void;
-    }
-  >
->(
-  (
-    { config, style, className, onMouseDown, onMouseUp, onTouchEnd, children },
-    ref
-  ) => {
-    return (
-      <div
-        data-grid={config.layout}
-        ref={ref}
-        style={style}
-        className={className}
-        onMouseDown={onMouseDown}
-        onMouseUp={onMouseUp}
-        onTouchEnd={onTouchEnd}
-      >
-        {/* Actual widget content */}
-        <Widget config={config.config} />
-        {/* Overlay for system controls, etc. */}
-        {children}
-      </div>
-    );
-  }
-);
