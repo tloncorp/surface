@@ -1,3 +1,4 @@
+import { useSurfaceState } from "@/state/surface";
 import { WidgetPane } from "@/types/surface";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGridLayout, { Layout } from "react-grid-layout";
@@ -5,9 +6,9 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import Widget from "./Widget";
 import { WidgetMenu } from "./WidgetMenu";
-import { useSurfaceState } from "@/state/surface";
 
-const gridSize = 100;
+const gridSize = 113;
+const gutter = 24;
 
 interface WidgetGridProps {
   id: string;
@@ -24,19 +25,25 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   const [config, setConfig] = useState<{
     columns: number;
     width: number;
-    padding: number;
+    paddingX: number;
+    paddingY: number;
+    rows: number;
   } | null>(null);
 
   useLayoutEffect(() => {
     if (!gridRef.current) return;
     const rect = gridRef.current.getBoundingClientRect();
-    const columns = Math.floor(rect.width / gridSize);
-    const width = columns * gridSize;
-    const padding = (rect.width - width) / 2;
+    const columns = Math.floor(rect.width / (gridSize + gutter));
+    const rows = Math.floor(rect.height / (gridSize + gutter));
+    const width = columns * gridSize + (columns - 1) * gutter;
+    const paddingX = (rect.width - width) / 2;
+    const paddingY = 48;
     setConfig({
       columns,
+      rows,
       width,
-      padding,
+      paddingX,
+      paddingY,
     });
   }, []);
 
@@ -65,15 +72,21 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   }, [widgets]);
 
   return (
-    <div ref={gridRef} className=" flex h-full w-full overflow-hidden">
+    <div
+      ref={gridRef}
+      className="flex h-full w-full overflow-hidden"
+      style={{ padding: `${config?.paddingY}px ${config?.paddingX}px` }}
+    >
       {config ? (
         <ReactGridLayout
           className="h-full w-full"
           width={config.width}
-          margin={[10, 10]}
+          margin={[gutter, gutter]}
+          containerPadding={[0, 0]}
           cols={config.columns}
           onLayoutChange={handleLayoutChange}
           rowHeight={gridSize}
+          maxRows={config.rows}
           compactType={null}
           isDroppable={true}
           allowOverlap={false}
