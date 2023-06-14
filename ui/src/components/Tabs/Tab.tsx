@@ -2,6 +2,16 @@ import { MouseEventHandler, useCallback } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import cn from 'classnames';
 import { TabConfig } from '../../types';
+import { useTabState } from '@/state/tabs';
+
+interface TabProps {
+  tab: TabConfig;
+  index: number;
+  onPress?: (tab: TabConfig) => void;
+  onPressClose?: (tab: TabConfig) => void;
+  onPressSplit?: (tab: TabConfig) => void;
+  isActive: boolean;
+};
 
 const Tab = ({
   tab,
@@ -10,19 +20,15 @@ const Tab = ({
   onPressClose,
   onPressSplit,
   isActive
-}: {
-  tab: TabConfig;
-  index: number;
-  onPress?: (tab: TabConfig) => void;
-  onPressClose?: (tab: TabConfig) => void;
-  onPressSplit?: (tab: TabConfig) => void;
-  isActive: boolean;
-}) => {
+}: TabProps) => {
+  const { switchTab, removeTab, splitTab } = useTabState();
   const handlePress = useCallback(() => {
+    switchTab(tab.id);
     onPress?.(tab);
   }, [onPress, tab]);
 
   const handlePressClose = useCallback(() => {
+    removeTab(tab.id);
     onPressClose?.(tab);
   }, [onPressClose, tab]);
 
@@ -30,6 +36,7 @@ const Tab = ({
     e => {
       e.preventDefault();
       e.stopPropagation();
+      splitTab(tab.id);
       onPressSplit?.(tab);
     },
     [onPressSplit, tab]
@@ -57,19 +64,19 @@ const Tab = ({
             >
               <span>{tab.panes.map(p => p.title).join(' + ')}</span>
               {tab.panes.length > 1 && (
-                <a
-                  className="rounded bg-gray-100 px-2 py-1 text-xs uppercase underline"
+                <button
+                  className="rounded bg-gray-100 px-2 py-1 text-xs uppercase"
                   onClick={handlePressSplit}
                 >
                   Split
-                </a>
+                </button>
               )}
-              <a
-                className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 text-sm uppercase underline"
+              <button
+                className="flex h-4 w-4 items-center justify-center rounded-full bg-gray-100 text-sm uppercase"
                 onClick={handlePressClose}
               >
                 &times;
-              </a>
+              </button>
             </div>
           </div>
         );
