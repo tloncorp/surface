@@ -25,7 +25,7 @@ const NewTabModal = ({
       className="fixed bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center p-4"
       onClick={handleBackdropClicked}
     >
-      <ul className="w-[300px] rounded-lg bg-white p-2 shadow-xl">
+      <ul className="w-[300px] max-h-[60vh] overflow-y-auto rounded-lg bg-white p-2 shadow-xl">
         {apps.map(app => {
           return (
             <div

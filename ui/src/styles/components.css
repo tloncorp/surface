@@ -6,6 +6,10 @@
   @apply inline-flex items-center justify-center rounded-lg bg-gray-50 py-2 px-4 text-lg font-semibold leading-4 text-gray-800 mix-blend-multiply ring-gray-200 ring-offset-2 ring-offset-white focus:outline-none focus-visible:ring-2 disabled:bg-gray-50 disabled:text-gray-400 dark:mix-blend-screen sm:text-base;
 }
 
+.nav-button {
+  @apply flex h-8 items-center justify-center rounded-md bg-white/40 p-2 text-gray-800;
+}
+
 .small-button {
   @apply inline-flex items-center justify-center rounded-md bg-gray-800 py-1 px-2 text-sm font-semibold text-white ring-gray-200 ring-offset-2 ring-offset-white focus:outline-none focus-visible:ring-2 disabled:bg-gray-200 disabled:text-gray-400 sm:h-6 sm:leading-4;
 }
