@@ -15,7 +15,7 @@ import Urbit, {
   SubscriptionRequestInterface,
 } from '@urbit/http-api';
 import UrbitMock from '@tloncorp/mock-http-api';
-import { Poke } from '@urbit/api';
+import { Poke } from '@urbit/http-api';
 import api from '../api';
 import {
   clearStorageMigration,

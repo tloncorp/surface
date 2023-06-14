@@ -1,4 +1,4 @@
-import { DocketHref } from "@urbit/api/dist/api";
+import { DocketHref } from "@/gear";
 
 export const getQueryParam = (key: string) => {
   const searchParams = new URLSearchParams(window.location.search);

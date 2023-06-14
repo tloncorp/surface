@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { DelBucket, DelEntry, PutBucket, Value } from '@urbit/api';
+import { DelBucket, DelEntry, PutBucket, Value } from '@/gear';
 import _ from 'lodash';
 import api from '../api';
 import useReactQuerySubscription from '@/logic/useReactQuerySubscription';

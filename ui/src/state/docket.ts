@@ -15,7 +15,7 @@ import {
   kilnRevive,
   kilnSuspend,
   allyShip
-} from '@urbit/api';
+} from '@/gear';
 import api from '@/api';
 import { normalizeUrbitColor } from '@/logic/utils';
 import { Status } from '@/logic/status';

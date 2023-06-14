@@ -6,7 +6,7 @@ import {
   scryAllies,
   scryCharges,
   scryDefaultAlly
-} from '@urbit/api';
+} from '@/gear';
 import useContactState from './contact';
 import { ChargesWithDesks, ChargeWithDesk, normalizeDocket } from './docket';
 

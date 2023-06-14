@@ -1,18 +1,15 @@
 import { useState, useCallback } from 'react';
-import ob from 'urbit-ob';
 import bigInt, { BigInteger } from 'big-integer';
 import {
   BigIntOrderedMap,
   Docket,
   DocketHref,
   Treaty,
-  unixToDa,
-} from '@urbit/api';
-import { formatUv } from '@urbit/aura';
+} from '@/gear';
+import { formatUv, unixToDa } from '@urbit/aura';
 import anyAscii from 'any-ascii';
 import { format, differenceInDays, endOfToday } from 'date-fns';
 import _ from 'lodash';
-import f from 'lodash/fp';
 import emojiRegex from 'emoji-regex';
 import { hsla, parseToHsla, parseToRgba } from 'color2k';
 import { useCopyToClipboard } from 'usehooks-ts';
