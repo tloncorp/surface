@@ -8,6 +8,7 @@ import CompassIcon from "./icons/CompassIcon"
 import MagnifyingGlassIcon from "./icons/MagnifyingGlassIcon"
 import OpenAppIcon from "./icons/OpenAppIcon"
 import { useSurfaceState } from "@/state/surface"
+import { Pane } from "@/types/surface"
 
 export const Nav = () => {
   const { addSurface } = useSurfaceState();
@@ -23,9 +24,9 @@ export const Nav = () => {
   );
 
   const handleTabAdded = useCallback(
-    ({ title, path }: { title: string; path: string }) => {
-      const id = title + new Date().getTime();
-      addSurface({ id, panes: [{ title, type: 'app', path }], addedAt: new Date().getTime() });
+    (pane: Pane) => {
+      const id = pane.title + new Date().getTime();
+      addSurface({ id, panes: [pane], addedAt: new Date().getTime() });
       setShowNewTabPicker(false);
     },
     [addSurface]
@@ -62,7 +63,7 @@ export const Nav = () => {
       </nav>
       <NewTabModal
         isOpen={showNewTabPicker}
-        onTabSelected={handleTabAdded}
+        onSurfaceSelected={handleTabAdded}
         onClose={handleNewTabPickerClosed}
       />
     </header>
