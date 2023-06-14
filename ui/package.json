@@ -11,13 +11,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.352.0",
     "@tanstack/react-query": "^4.29.12",
     "@tanstack/react-query-devtools": "^4.29.12",
     "@tanstack/react-query-persist-client": "^4.29.12",
     "@tlon/sigil-js": "^1.4.5",
     "@tloncorp/mock-http-api": "^1.2.0",
     "@types/react-beautiful-dnd": "^13.1.4",
-    "@urbit/api": "^2.2.0",
     "@urbit/aura": "^1.0.0",
     "@urbit/http-api": "^2.4.5-debug",
     "any-ascii": "^0.3.2",
@@ -25,6 +25,7 @@
     "color2k": "^2.0.2",
     "date-fns": "^2.30.0",
     "idb-keyval": "^6.2.1",
+    "immer": "^9.0.5",
     "lodash": "^4.17.21",
     "node-fetch": "^3.3.1",
     "react": "^17.0.2",
@@ -34,7 +35,6 @@
     "react-query": "^3.39.3",
     "react-router-dom": "5.2",
     "shared-zustand": "^2.0.0",
-    "urbit-ob": "^5.0.1",
     "usehooks-ts": "^2.9.1",
     "zustand": "^4.3.8"
   },

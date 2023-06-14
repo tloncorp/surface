@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import { useCallback, useMemo } from 'react';
 import _ from 'lodash';
 import api from '@/api';
@@ -9,10 +8,10 @@ import {
   ContactEditField,
   ContactHeed,
   ContactNews,
-  ContactRolodex
-} from '@/types/contact';
-import { preSig } from '@urbit/aura';
+  ContactRolodex,
+} from '@/gear';
 import { Patp } from '@urbit/http-api';
+import { preSig } from '@urbit/aura'; 
 import produce from 'immer';
 
 export interface BaseContactState {
@@ -34,7 +33,7 @@ function contactAction<T>(data: T) {
   return {
     app: 'contacts',
     mark: 'contact-action',
-    json: data
+    json: data,
   };
 }
 
@@ -46,25 +45,25 @@ const useContactState = createState<BaseContactState>(
     fetchAll: async () => {
       const contacts = await api.scry<ContactRolodex>({
         app: 'contacts',
-        path: '/all'
+        path: '/all',
       });
 
       set(
         produce((draft: BaseContactState) => {
           draft.contacts = {
             ...draft.contacts,
-            ...contacts
+            ...contacts,
           };
         })
       );
     },
-    edit: async contactFields => {
+    edit: async (contactFields) => {
       await api.poke<ContactEdit>(contactAction({ edit: contactFields }));
     },
     anon: async () => {
       await api.poke<ContactAnon>(contactAction({ anon: null }));
     },
-    heed: async ships => {
+    heed: async (ships) => {
       await api.poke<ContactHeed>(contactAction({ heed: ships }));
     },
     start: () => {
@@ -83,12 +82,12 @@ const useContactState = createState<BaseContactState>(
               }
             })
           );
-        }
+        },
       });
-    }
+    },
   }),
   {
-    partialize: ({ contacts }) => ({ contacts })
+    partialize: ({ contacts }) => ({ contacts }),
   },
   []
 );
@@ -100,7 +99,7 @@ export const emptyContact = {
   color: '0x0',
   avatar: null,
   cover: null,
-  groups: [] as string[]
+  groups: [] as string[],
 };
 
 const selContacts = (s: ContactState) => s.contacts;
@@ -114,7 +113,7 @@ export function useMemoizedContacts() {
 
 export function useContact(ship: string) {
   return useContactState(
-    useCallback(s => s.contacts[preSig(ship)] || emptyContact, [ship])
+    useCallback((s) => s.contacts[preSig(ship)] || emptyContact, [ship])
   );
 }
 

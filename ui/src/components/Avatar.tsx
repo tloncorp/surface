@@ -2,7 +2,8 @@ import { isValidPatp } from 'urbit-ob';
 import classNames from 'classnames';
 import React, { CSSProperties } from 'react';
 import { sigil as sigilRaw, reactRenderer } from '@tlon/sigil-js';
-import { deSig, Contact, cite } from '@urbit/api';
+import { Contact } from '@/gear';
+import { deSig, cite } from '@urbit/aura';
 import _ from 'lodash';
 import { darken, lighten, parseToHsla } from 'color2k';
 import { useCalm } from '@/state/settings';
@@ -60,8 +61,7 @@ const emptyContact: Contact = {
   color: '#000000',
   avatar: null,
   cover: null,
-  groups: [],
-  'last-updated': 0
+  groups: []
 };
 
 function themeAdjustColor(color: string, theme: 'light' | 'dark'): string {
@@ -112,13 +112,13 @@ function getSigilElement(
   bg: string,
   fg: string
 ) {
-
   const citedShip = cite(ship);
 
   if (
     !ship ||
     ship === 'undefined' ||
     !isValidPatp(ship) ||
+    !citedShip ||
     citedShip.match(/[_^]/) ||
     citedShip.length > 14
   ) {
@@ -144,7 +144,6 @@ export default function Avatar({
 }: AvatarProps) {
   const currentTheme = useCurrentTheme();
   const contact = useContact(ship);
-  console.log({contact})
   const calm = useCalm();
   const { previewColor, previewAvatar } = previewData ?? {};
   const previewAvatarIsValid =

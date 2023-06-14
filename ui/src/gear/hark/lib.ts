@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import bigInt from 'big-integer';
 import {
   Blanket,
   Carpet,
@@ -7,9 +8,9 @@ import {
   Rope,
   Seam,
   Skein,
-} from '@/types/hark';
+} from './types';
 import api from '@/api';
-import { parseUd } from '@urbit/aura';
+import { formatUd } from '@urbit/aura';
 import useReactQuerySubscription from '@/logic/useReactQuerySubscription';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -40,7 +41,7 @@ export function useBlanket(flag?: Flag) {
   const quilt = isSuccess
     ? carpet?.stitch === 0
       ? '0'
-      : parseUd(carpet?.stitch?.toString() ?? '0')
+      : formatUd(bigInt(carpet?.stitch) ?? 0)
     : '0';
   const { data, ...rest } = useReactQuerySubscription({
     queryKey: ['blanket', flag],
