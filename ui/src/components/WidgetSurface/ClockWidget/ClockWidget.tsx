@@ -18,7 +18,7 @@ const ClockWidget = ({
     // text: TextClock,
   }[widget.config.type];
 
-  return <Component size={[widget.layout.w * 100, widget.layout.h * 100]} />;
+  return <Component size={[widget.layout.w, widget.layout.h]} />;
 };
 
 export default ClockWidget;

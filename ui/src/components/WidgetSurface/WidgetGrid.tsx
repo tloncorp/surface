@@ -40,17 +40,20 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
     });
   }, []);
 
-  const handleLayoutChange = useCallback((newLayouts: Layout[]) => {
-    updatePane(id, {
-      ...pane,
-      widgets: widgets.map((item, i) => {
-        return {
-          ...item,
-          layout: { ...newLayouts[i] },
-        };
-      })
-    });
-  }, [id, pane, widgets]);
+  const handleLayoutChange = useCallback(
+    (newLayouts: Layout[]) => {
+      updatePane(id, {
+        ...pane,
+        widgets: widgets.map((item, i) => {
+          return {
+            ...item,
+            layout: { ...newLayouts[i] },
+          };
+        }),
+      });
+    },
+    [id, pane, widgets]
+  );
 
   const { children, layouts } = useMemo(() => {
     return {
@@ -62,7 +65,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   }, [widgets]);
 
   return (
-    <div ref={gridRef} className="relative flex h-full w-full overflow-hidden">
+    <div ref={gridRef} className=" flex h-full w-full overflow-hidden">
       {config ? (
         <ReactGridLayout
           className="h-full w-full"
@@ -80,7 +83,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           {children}
         </ReactGridLayout>
       ) : null}
-      <footer className="fixed bottom-0 left-0 w-full flex justify-center p-2">
+      <footer className="fixed bottom-0 left-0 flex w-full justify-center p-2">
         <div className="flex items-center justify-center space-x-2">
           <button className="nav-button default-focus">Edit Tab</button>
           <WidgetMenu id={id} pane={pane} />
