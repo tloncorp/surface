@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, subscribeWithSelector} from "zustand/middleware";
 import { share, isSupported } from "shared-zustand";
-import { Surface } from "@/types/surface";
+import { Pane, Surface } from "@/types/surface";
 import { getQueryParam } from "@/logic/utils";
 
 interface SurfaceState {
@@ -10,6 +10,7 @@ interface SurfaceState {
   activeSurface: string | null;
   switchSurface: (id: string) => void;
   addSurface: (surface: Surface) => void;
+  addSurfaceWithPane: (pane: Pane) => void;
   removeSurface: (id: string) => void;
   splitSurface: (id: string) => void;
   /**
@@ -38,6 +39,11 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
     set({ activeSurface: id });
   },
   addSurface: (surface) => {
+    set((draft) => ({ ...updateSurfaces([...draft.surfaces, surface]), activeSurface: surface.id }))
+  },
+  addSurfaceWithPane: (pane) => {
+    const id = pane.title + new Date().getTime();
+    const surface: Surface = { id, panes: [pane], addedAt: new Date().getTime() };
     set((draft) => ({ ...updateSurfaces([...draft.surfaces, surface]), activeSurface: surface.id }))
   },
   removeSurface: (id) => {
