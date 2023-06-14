@@ -4,16 +4,16 @@ import { InteractionContextProvider } from './InteractionContext';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import WidgetGrid from './WidgetSurface/WidgetGrid';
 import bootstrap from '@/state/bootstrap';
-import { setQueryParam } from '@/util';
-import { useActiveTab } from '@/state/tabs';
+import { setQueryParam } from '@/logic/utils';
+import { useActiveSurface } from '@/state/surface';
 import { Main } from './Main';
 
 const AppRoutes = () => {
-  const activeTab = useActiveTab();
+  const activeSurface = useActiveSurface();
   // Persist active tab to query param when it changes
   useEffect(() => {
-    setQueryParam("tab", activeTab);
-  }, [activeTab]);
+    setQueryParam("surface", activeSurface);
+  }, [activeSurface]);
   
   return (
     <Switch>
