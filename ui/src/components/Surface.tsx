@@ -12,22 +12,12 @@ export const Surface = () => {
   
   return (
     <div className="relative flex h-full w-full flex-1 flex-col">
-      {tabContent.map((tab) => {
-        return (
-          <div
-            key={tab.id}
-            className="absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0"
-          >
-            {tab.panes.map((pane) => (
-              <TabContent
-                config={{ path: pane.path }}
-                isLive={tab.id === activeTab}
-                key={pane.path}
-              />
-            ))}
-          </div>
-        );
-      })}
+      {tabContent.map((tab) => (
+        <TabContent
+          tab={tab}
+          key={tab.id}
+        />
+      ))}
     </div>
   )
 }

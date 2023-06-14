@@ -1,11 +1,13 @@
 import React, { useContext, useEffect } from 'react';
 import cn from 'classnames';
 import { InteractionContext } from '@/components/InteractionContext';
+import { TabConfig } from '@/types';
+import { useTabState } from '@/state/tabs';
 
 /**
  * Responsible for rendering an app in an iframe.
  */
-const TabContent = ({
+const TabPane = ({
   config,
   isLive,
 }: {
@@ -53,5 +55,26 @@ const TabContent = ({
     </div>
   ) : null;
 };
+
+interface TabContentProps {
+  tab: TabConfig;
+}
+
+const TabContent = ({ tab }: TabContentProps) => {
+  const { activeTab } = useTabState();
+  const isActive = tab.id === activeTab;
+
+  return (
+    <div className={cn("absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0", isActive ? 'z-30' : 'z-20' )}>
+      {tab.panes.map((pane) => (
+        <TabPane
+          config={pane}
+          isLive={isActive}
+          key={pane.path}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default TabContent;
