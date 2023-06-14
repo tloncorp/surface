@@ -20,7 +20,7 @@ import api from '../api';
 import {
   clearStorageMigration,
   createStorageKey,
-} from '../logic/utils';
+} from '@/logic/utils';
 import { storageVersion } from '@/constants';
 
 setAutoFreeze(false);

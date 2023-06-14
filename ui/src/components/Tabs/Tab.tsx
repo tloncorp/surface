@@ -1,53 +1,53 @@
 import { MouseEventHandler, useCallback } from 'react';
 import { Draggable } from 'react-beautiful-dnd';
 import cn from 'classnames';
-import { TabConfig } from '../../types';
-import { useTabState } from '@/state/tabs';
+import { Surface } from '@/types/surface';
+import { useSurfaceState } from '@/state/surface';
 
 interface TabProps {
-  tab: TabConfig;
+  surface: Surface;
   index: number;
-  onPress?: (tab: TabConfig) => void;
-  onPressClose?: (tab: TabConfig) => void;
-  onPressSplit?: (tab: TabConfig) => void;
   isActive: boolean;
+  onPress?: (surface: Surface) => void;
+  onPressClose?: (surface: Surface) => void;
+  onPressSplit?: (surface: Surface) => void;
 };
 
 const Tab = ({
-  tab,
+  surface,
   index,
   onPress,
   onPressClose,
   onPressSplit,
   isActive
 }: TabProps) => {
-  const { switchTab, removeTab, splitTab } = useTabState();
+  const { switchSurface, removeSurface, splitSurface } = useSurfaceState();
   const handlePress = useCallback(() => {
-    switchTab(tab.id);
-    onPress?.(tab);
-  }, [onPress, tab]);
+    switchSurface(surface.id);
+    onPress?.(surface);
+  }, [onPress, surface]);
 
   const handlePressClose = useCallback(() => {
-    removeTab(tab.id);
-    onPressClose?.(tab);
-  }, [onPressClose, tab]);
+    removeSurface(surface.id);
+    onPressClose?.(surface);
+  }, [onPressClose, surface]);
 
   const handlePressSplit: MouseEventHandler = useCallback(
     e => {
       e.preventDefault();
       e.stopPropagation();
-      splitTab(tab.id);
-      onPressSplit?.(tab);
+      splitSurface(surface.id);
+      onPressSplit?.(surface);
     },
-    [onPressSplit, tab]
+    [onPressSplit, surface]
   );
 
   return (
-    <Draggable key={tab.id} draggableId={tab.id} index={index}>
+    <Draggable key={surface.id} draggableId={surface.id} index={index}>
       {({ innerRef, draggableProps, dragHandleProps }) => {
         return (
           <div
-            key={tab.id}
+            key={surface.id}
             onClick={handlePress}
             {...draggableProps}
             {...dragHandleProps}
@@ -62,8 +62,8 @@ const Tab = ({
                 }
               )}
             >
-              <span>{tab.panes.map(p => p.title).join(' + ')}</span>
-              {tab.panes.length > 1 && (
+              <span>{surface.title || surface.panes.map(p => p.title).join(' + ')}</span>
+              {surface.panes.length > 1 && (
                 <button
                   className="rounded bg-gray-100 px-2 py-1 text-xs uppercase"
                   onClick={handlePressSplit}

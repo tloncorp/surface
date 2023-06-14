@@ -5,14 +5,14 @@ import {
   OnDragEndResponder
 } from 'react-beautiful-dnd';
 import Tab from '@/components/Tabs/Tab';
-import { useTabState } from '@/state/tabs';
+import { useSurfaceState } from '@/state/surface';
 
 const TabList = () => {
-  const { tabs, activeTab, moveTab, combineTabs } = useTabState();
+  const { surfaces, activeSurface, moveSurface, combineSurfaces } = useSurfaceState();
   const handleDragEnd: OnDragEndResponder = useCallback(
     result => {
       if (result.combine) {
-        combineTabs(result.draggableId, result.combine.draggableId);
+        combineSurfaces(result.draggableId, result.combine.draggableId);
         return;
       }
       const sourceIndex = result.source.index;
@@ -22,13 +22,13 @@ const TabList = () => {
         destinationIndex !== null &&
         typeof destinationIndex !== 'undefined'
       ) {
-        moveTab(sourceIndex, destinationIndex);
+        moveSurface(sourceIndex, destinationIndex);
       }
     },
-    [moveTab, combineTabs]
+    [moveSurface, combineSurfaces]
   );
 
-  if (tabs.length === 0) {
+  if (surfaces.length === 0) {
     return null;
   }
 
@@ -46,12 +46,12 @@ const TabList = () => {
               ref={innerRef}
               className="flex-initial flex gap-2"
             >
-              {tabs.map((tab, index) => (
+              {surfaces.map((surface, index) => (
                 <Tab
-                  tab={tab}
+                  surface={surface}
                   index={index}
-                  isActive={tab.id === activeTab}
-                  key={tab.id}
+                  isActive={surface.id === activeSurface}
+                  key={surface.id}
                 />
               ))}
 

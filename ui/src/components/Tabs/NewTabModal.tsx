@@ -1,7 +1,8 @@
 import { useCallback } from "react";
 import { getAppHref, normalizeUrbitColor } from "@/logic/utils";
-import { TabContentConfig } from "@/types";
+import { Pane } from "@/types/surface";
 import { useInstalledApps } from "@/state/docket";
+import AddIcon from "../icons/AddIcon";
 
 /**
  * Dash is the app that lets you create a widget grid.
@@ -15,15 +16,17 @@ const dashAppMeta = {
   },
 };
 
+interface NewSurfaceModalProps {
+  isOpen: boolean;
+  onSurfaceSelected: (pane: Pane) => void;
+  onClose: () => void;
+}
+
 const NewTabModal = ({
   isOpen,
-  onTabSelected,
+  onSurfaceSelected,
   onClose,
-}: {
-  isOpen: boolean;
-  onTabSelected: (pane: TabContentConfig) => void;
-  onClose: () => void;
-}) => {
+}: NewSurfaceModalProps) => {
   const apps = useInstalledApps();
 
   const handleBackdropClicked = useCallback(() => {
@@ -38,14 +41,19 @@ const NewTabModal = ({
       onClick={handleBackdropClicked}
     >
       <ul className="max-h-[60vh] w-[300px] overflow-y-auto rounded-lg bg-white p-2 shadow-xl">
+        <li className="flex cursor-pointer items-center gap-3 p-2" onClick={() => onSurfaceSelected({ title: 'widgets', type: 'widget', widgets: [] })}>
+          <AddIcon className="h-6 w-6" />
+          Widgets
+        </li>
         {[dashAppMeta, ...apps].map((app) => {
           return (
-            <div
+            <li
               className="flex cursor-pointer items-center gap-3 p-2"
               key={app.title}
               onClick={() =>
-                onTabSelected({
+                onSurfaceSelected({
                   title: app.title,
+                  type: 'app',
                   path: getAppHref(app.href),
                 })
               }
@@ -57,7 +65,7 @@ const NewTabModal = ({
                 className="h-6 w-6 rounded"
               ></div>
               {app.title}
-            </div>
+            </li>
           );
         })}
       </ul>

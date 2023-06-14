@@ -7,10 +7,11 @@ import CaretDownIcon from "./icons/CaretDownIcon"
 import CompassIcon from "./icons/CompassIcon"
 import MagnifyingGlassIcon from "./icons/MagnifyingGlassIcon"
 import OpenAppIcon from "./icons/OpenAppIcon"
-import { useTabState } from "@/state/tabs"
+import { useSurfaceState } from "@/state/surface"
+import { Pane } from "@/types/surface"
 
 export const Nav = () => {
-  const { addTab } = useTabState();
+  const { addSurface } = useSurfaceState();
   const [showNewTabPicker, setShowNewTabPicker] = useState(false);
   const handlePressAddTab = useCallback(
     () => setShowNewTabPicker((p) => !p),
@@ -23,12 +24,12 @@ export const Nav = () => {
   );
 
   const handleTabAdded = useCallback(
-    ({ title, path }: { title: string; path: string }) => {
-      const id = title + new Date().getTime();
-      addTab({ id, panes: [{ title, path }], addedAt: new Date().getTime() });
+    (pane: Pane) => {
+      const id = pane.title + new Date().getTime();
+      addSurface({ id, panes: [pane], addedAt: new Date().getTime() });
       setShowNewTabPicker(false);
     },
-    [addTab]
+    [addSurface]
   );
 
   return (
@@ -62,7 +63,7 @@ export const Nav = () => {
       </nav>
       <NewTabModal
         isOpen={showNewTabPicker}
-        onTabSelected={handleTabAdded}
+        onSurfaceSelected={handleTabAdded}
         onClose={handleNewTabPickerClosed}
       />
     </header>

@@ -3,7 +3,23 @@ import { Layout } from "react-grid-layout";
 export interface Surface {
   id: string;
   addedAt: number;
-  content: Tab | Widgets;
+  panes: Pane[];
+  // a title which supercedes the pane titles
+  title?: string;
+}
+
+export type Pane = AppPane | WidgetPane;
+
+export interface AppPane {
+  title: string;
+  type: "app";
+  path: string;
+}
+
+export interface WidgetPane {
+  title: string;
+  type: "widget";
+  widgets: Widget[];
 }
 
 export interface WidgetProps<Config = any> {
@@ -32,14 +48,4 @@ export interface Widget<Config = any> {
   type: WidgetType;
   layout: Layout;
   config: Config;
-}
-
-export interface Tab {
-  type: "tab";
-  panes: TabPane[];
-}
-
-export interface TabPane {
-  title: string;
-  path: string;
 }
