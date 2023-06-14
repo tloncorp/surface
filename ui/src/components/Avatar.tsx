@@ -1,4 +1,4 @@
-import { isValidPatp } from 'urbit-ob';
+import { isValidPatp } from '@urbit/aura';
 import classNames from 'classnames';
 import React, { CSSProperties } from 'react';
 import { sigil as sigilRaw, reactRenderer } from '@tlon/sigil-js';

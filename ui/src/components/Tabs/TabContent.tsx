@@ -41,9 +41,9 @@ const TabContent = ({
         // by default, iframes will eat pointer events, which can cause issues during drag
         pointerEvents: dragInteractionInProgress ? "none" : undefined,
       }}
-      className={cn("flex h-full w-full flex-col overflow-hidden rounded-lg", {
+      className={cn("flex flex-col overflow-hidden rounded-lg", {
         "absolute left-0 top-0 w-0 h-0": !isLive,
-        relative: isLive,
+        "relative h-full w-full": isLive,
       })}
     >
       <iframe

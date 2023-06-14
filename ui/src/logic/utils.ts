@@ -152,11 +152,6 @@ export function clearStorageMigration<T>() {
   return {} as T;
 }
 
-export const storageVersion = parseInt(
-  import.meta.env.VITE_STORAGE_VERSION,
-  10
-);
-
 export function preSig(ship: string): string {
   if (!ship) {
     return '';

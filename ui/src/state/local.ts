@@ -1,11 +1,11 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import produce from 'immer';
 import {
   clearStorageMigration,
   createStorageKey,
-  storageVersion,
 } from '../logic/utils';
+import { storageVersion } from '@/constants';
 
 export type SubscriptionStatus = 'connected' | 'disconnected' | 'reconnecting';
 
@@ -20,8 +20,8 @@ interface LocalState {
   set: (f: (s: LocalState) => void) => void;
 }
 
-export const useLocalState = create<LocalState>(
-  persist<LocalState>(
+export const useLocalState = create<LocalState>()(
+  persist(
     (set, get) => ({
       set: (f) => set(produce(get(), f)),
       currentTheme: 'light',

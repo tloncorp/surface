@@ -8,7 +8,7 @@ import {
 } from 'immer';
 import { compose } from 'lodash/fp';
 import _ from 'lodash';
-import create, { GetState, SetState, UseStore } from 'zustand';
+import { create, GetState, SetState, StoreApi } from 'zustand';
 import { PersistOptions, persist } from 'zustand/middleware';
 import Urbit, {
   FatalError,
@@ -20,8 +20,8 @@ import api from '../api';
 import {
   clearStorageMigration,
   createStorageKey,
-  storageVersion,
 } from '../logic/utils';
+import { storageVersion } from '@/constants';
 
 setAutoFreeze(false);
 enablePatches();
@@ -58,7 +58,7 @@ export const optStateSetter = <T extends Record<string, unknown>>(
 };
 
 export const reduceState = <S extends Record<string, unknown>, U>(
-  state: UseStore<S & BaseState<S>>,
+  state: StoreApi<S & BaseState<S>>,
   data: U,
   reducers: ((payload: U, current: S & BaseState<S>) => S & BaseState<S>)[]
 ): void => {
@@ -78,7 +78,7 @@ export const reduceStateN = <S extends Record<string, unknown>, U>(
 };
 
 export const optReduceState = <S extends Record<string, unknown>, U>(
-  state: UseStore<S & BaseState<S>>,
+  state: StoreApi<S & BaseState<S>>,
   data: U,
   reducers: ((payload: U, current: S & BaseState<S>) => BaseState<S> & S)[]
 ): string => {
@@ -141,7 +141,7 @@ export const createState = <T extends Record<string, unknown>>(
     set: SetState<T & BaseState<T>>,
     get: GetState<T & BaseState<T>>
   ) => SubscriptionRequestInterface)[] = []
-): UseStore<T & BaseState<T>> => {
+): StoreApi<T & BaseState<T>> => {
   const persistOptions = {
     name: stateStorageKey(name),
     version: storageVersion,
@@ -149,8 +149,8 @@ export const createState = <T extends Record<string, unknown>>(
     ...options,
   };
 
-  return create<T & BaseState<T>>(
-    persist<T & BaseState<T>>(
+  return create<T & BaseState<T>>()(
+    persist(
       (set, get) => ({
         initialize: async (airlock: Urbit) => {
           await Promise.all(
@@ -185,7 +185,7 @@ export const createState = <T extends Record<string, unknown>>(
 };
 
 export async function doOptimistically<A, S extends Record<string, unknown>>(
-  state: UseStore<S & BaseState<S>>,
+  state: StoreApi<S & BaseState<S>>,
   action: A,
   call: (a: A) => Promise<any>,
   reduce: ((a: A, fn: S & BaseState<S>) => S & BaseState<S>)[]
@@ -204,7 +204,7 @@ export async function doOptimistically<A, S extends Record<string, unknown>>(
 }
 
 export async function pokeOptimisticallyN<A, S extends Record<string, unknown>>(
-  state: UseStore<S & BaseState<S>>,
+  state: StoreApi<S & BaseState<S>>,
   poke: Poke<any>,
   reduce: ((a: A, fn: S & BaseState<S>) => S & BaseState<S>)[],
   withRollback = true

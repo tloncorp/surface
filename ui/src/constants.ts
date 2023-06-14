@@ -35,3 +35,9 @@ export const AUTHORS = [
 ];
 
 export const lsDesk = 'garden';
+
+
+export const storageVersion = parseInt(
+  import.meta.env.VITE_STORAGE_VERSION,
+  10
+);

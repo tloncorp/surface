@@ -20,7 +20,7 @@ interface TabState {
   moveTab: (sourceIndex: number, targetIndex: number) => void;
 }
 
-function updateTabs(tabs: TabConfig[]): Partial<TabState> {
+function updateTabs(tabs: TabConfig[]) {
   const index = tabs.reduce<Record<string, number>>((acc, tab, index) => {
     acc[tab.id] = index;
     return acc;
