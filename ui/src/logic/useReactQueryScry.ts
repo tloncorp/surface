@@ -7,7 +7,7 @@ export default function useReactQueryScry<Data>({
   app,
   path,
   priority = 3,
-  options,
+  options
 }: {
   queryKey: QueryKey;
   app: string;
@@ -16,17 +16,13 @@ export default function useReactQueryScry<Data>({
   options?: UseQueryOptions<Data>;
 }) {
   const fetchData = async () =>
-    useSchedulerStore.getState().wait(
-      async () =>
-        api.scry<Data>({
-          app,
-          path,
-        }),
-      priority
-    );
+    api.scry<Data>({
+      app,
+      path
+    });
 
   return useQuery<Data>(queryKey, fetchData, {
     retryOnMount: false,
-    ...options,
+    ...options
   });
 }

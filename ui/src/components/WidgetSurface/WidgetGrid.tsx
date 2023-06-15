@@ -36,7 +36,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
     setConfig({
       columns,
       width,
-      padding,
+      padding
     });
   }, []);
 
@@ -46,7 +46,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       widgets: widgets.map((item, i) => {
         return {
           ...item,
-          layout: { ...newLayouts[i] },
+          layout: { ...newLayouts[i] }
         };
       })
     });
@@ -67,7 +67,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
         <ReactGridLayout
           className="h-full w-full"
           width={config.width}
-          margin={[10, 10]}
+          margin={[0, 8]}
           cols={config.columns}
           onLayoutChange={handleLayoutChange}
           rowHeight={gridSize}

@@ -1,11 +1,12 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { InteractionContextProvider } from './InteractionContext';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import bootstrap from '@/state/bootstrap';
 import { setQueryParam } from '@/logic/utils';
 import { useActiveSurface } from '@/state/surface';
 import { Main } from './Main';
+import { TooltipProvider } from '@radix-ui/react-tooltip';
 
 const AppRoutes = () => {
   const activeSurface = useActiveSurface();
@@ -13,11 +14,12 @@ const AppRoutes = () => {
   useEffect(() => {
     setQueryParam("surface", activeSurface);
   }, [activeSurface]);
-  
+
+
   return (
-    <Switch>
-      <Route path={'/'} component={Main} />
-    </Switch>
+    <Routes>
+      <Route path={'/'} element={<Main />} />
+    </Routes>
   );
 };
 
@@ -31,8 +33,10 @@ function Root() {
   return (
     <BrowserRouter basename={base}>
       <InteractionContextProvider>
-        <ReactQueryDevtools initialIsOpen={false} />
-        <AppRoutes />
+        <TooltipProvider>
+          <ReactQueryDevtools initialIsOpen={false} />
+          <AppRoutes />
+        </TooltipProvider>
       </InteractionContextProvider>
     </BrowserRouter>
   );
