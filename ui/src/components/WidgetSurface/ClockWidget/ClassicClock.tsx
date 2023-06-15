@@ -46,7 +46,8 @@ interface ClassicClockConfig {
 const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const config = useMemo(() => generateRandomConfig(), []);
-  const time = useTime(20);
+  const time = useTime(1, 1000);
+  const renderSize = Math.min(size[0], size[1]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -61,8 +62,6 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(centerX, centerY) - 10;
-
-    console.log("draw", centerX, centerY, radius);
 
     // Hour hand
     if (config.hourHand.enabled) {
@@ -116,11 +115,11 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
   return (
     <canvas
       ref={canvasRef}
-      width={size[0] * window.devicePixelRatio}
-      height={size[1] * window.devicePixelRatio}
+      width={renderSize * window.devicePixelRatio}
+      height={renderSize * window.devicePixelRatio}
       style={{
-        width: size[0],
-        height: size[1],
+        width: renderSize,
+        height: renderSize,
         backgroundColor: config.backgroundColor,
         borderRadius: config.borderRadius,
         filter: `blur(${blur}px)`,
@@ -135,6 +134,15 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
 export default Clock;
 
 function generateRandomConfig(): ClassicClockConfig {
+  const lengths = [
+    random.number(0.1, 1.0),
+    random.number(0.1, 1.0),
+    random.number(0.1, 1.0),
+  ].sort((a, b) => a - b);
+  const widths = [random.int(1, 10), random.int(1, 10), random.int(1, 10)].sort(
+    (a, b) => a - b
+  );
+  console.log(widths, lengths);
   return {
     backgroundColor: random.color(),
     borderColor: random.color(),
@@ -144,20 +152,20 @@ function generateRandomConfig(): ClassicClockConfig {
     blur: random.boolean() ? 0 : random.int(0, 20),
     hourHand: {
       enabled: true,
-      width: random.int(1, 10),
-      length: random.number(0.2, 0.5),
+      width: widths[2],
+      length: lengths[0],
       color: random.color(),
     },
     minuteHand: {
       enabled: true,
-      width: random.int(1, 10),
-      length: random.number(0.6, 0.8),
+      width: widths[1],
+      length: lengths[1],
       color: random.color(),
     },
     secondHand: {
       enabled: true,
-      width: random.int(1, 10),
-      length: random.number(0.8, 1),
+      width: widths[0],
+      length: lengths[2],
       color: random.color(),
     },
   };
@@ -189,5 +197,8 @@ function circlePoint(
   radius: number,
   angle: number
 ): [number, number] {
-  return [x + radius * Math.sin(angle), y + radius * Math.cos(angle)];
+  return [
+    x + radius * Math.cos(angle - Math.PI / 2),
+    y + radius * Math.sin(angle - Math.PI / 2),
+  ];
 }
