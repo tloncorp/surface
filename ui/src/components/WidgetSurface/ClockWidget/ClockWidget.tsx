@@ -4,7 +4,7 @@ import ColorClock from "./ColorClock";
 import SeasonClock from "./SeasonClock";
 import TextClock from "./TextClock";
 import useTime from "./useTime";
-import { WidgetProps } from '@/widgets';
+import { WidgetProps } from "@/widgets";
 
 const ClockWidget = ({
   widget,
@@ -13,9 +13,9 @@ const ClockWidget = ({
 }>) => {
   const Component = {
     classic: ClassicClock,
-    // color: ColorClock,
-    // season: SeasonClock,
-    // text: TextClock,
+    color: ColorClock,
+    seasons: SeasonClock,
+    text: TextClock,
   }[widget.config.type];
 
   return <Component size={[widget.layout.w, widget.layout.h]} />;
