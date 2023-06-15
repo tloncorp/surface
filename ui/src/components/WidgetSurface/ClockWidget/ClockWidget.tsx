@@ -4,7 +4,7 @@ import ColorClock from "./ColorClock";
 import SeasonClock from "./SeasonClock";
 import TextClock from "./TextClock";
 import useTime from "./useTime";
-import { WidgetProps } from "@/types/surface";
+import { WidgetProps } from '@/widgets';
 
 const ClockWidget = ({
   widget,

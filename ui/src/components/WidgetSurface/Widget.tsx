@@ -1,6 +1,6 @@
-import { WidgetProps } from "@/types/surface";
+import { WidgetProps } from '@/widgets';
 import React, { HTMLProps, PropsWithChildren } from "react";
-import widgetDefs from "./widgetDefs";
+import { widgets } from '@/widgets';
 
 const Widget = React.forwardRef<
   HTMLDivElement,
@@ -10,7 +10,7 @@ const Widget = React.forwardRef<
     // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
     PropsWithChildren<HTMLProps<HTMLDivElement>>
 >(({ widget, ...forwardProps }, ref) => {
-  const def = widgetDefs[widget.type];
+  const def = widgets[widget.type];
 
   // All values in `react-grid-layout` `Layout`s are specified in grid units, and
   // need to be translated to pixel dimensions to be useful. It's kind of a pain

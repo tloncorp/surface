@@ -1,17 +1,9 @@
 import _ from 'lodash';
-import {
-  Blanket,
-  Carpet,
-  Flag,
-  HarkAction,
-  Rope,
-  Seam,
-  Skein,
-} from '@/types/hark';
-import api from '@/api';
-import { parseUd } from '@urbit/aura';
+import { HarkAction, Rope, Seam, Skein } from '@/gear';
 import useReactQuerySubscription from '@/logic/useReactQuerySubscription';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { SettingsState } from './settings';
+import api from '@/api';
 
 function harkAction(action: HarkAction) {
   return {
@@ -21,52 +13,26 @@ function harkAction(action: HarkAction) {
   };
 }
 
-export function useCarpet(flag?: Flag) {
-  const { data, ...rest } = useReactQuerySubscription({
-    queryKey: ['carpet', flag],
+export function useSkeins() {
+  const queryClient = useQueryClient();
+  const { data, ...rest } = useReactQuerySubscription<Skein[], HarkAction>({
+    queryKey: ['skeins'],
     app: 'hark',
     path: '/ui',
-    scry: flag ? `/group/${flag}/latest` : `/desk/${window.desk}/latest`,
-  });
-
-  return {
-    data: data as Carpet,
-    ...rest,
-  };
-}
-
-export function useBlanket(flag?: Flag) {
-  const { data: carpet, isSuccess } = useCarpet(flag);
-  const quilt = isSuccess
-    ? carpet?.stitch === 0
-      ? '0'
-      : parseUd(carpet?.stitch?.toString() ?? '0')
-    : '0';
-  const { data, ...rest } = useReactQuerySubscription({
-    queryKey: ['blanket', flag],
-    app: 'hark',
-    path: '/ui',
-    scry: flag
-      ? `/group/${flag}/quilt/${quilt}`
-      : `/desk/${window.desk}/quilt/${quilt}`,
-    options: { enabled: isSuccess },
-  });
-
-  return {
-    data: data as Blanket,
-    ...rest,
-  };
-}
-
-export function useSkeins(flag?: Flag) {
-  const { data, ...rest } = useReactQuerySubscription({
-    queryKey: ['skeins', flag ? flag : window.desk],
-    app: 'hark',
-    path: '/ui',
-    scry: flag ? `/group/${flag}/skeins` : `/desk/${window.desk}/skeins`,
+    scry: '/all/skeins',
     options: {
       refetchOnMount: true,
       retry: 1,
+    },
+    onEvent: (event) => {
+      if (!('add-yarn' in event)) {
+        return;
+      }
+
+      const settings = queryClient.getQueryData<SettingsState>([
+        'settings',
+        window.desk,
+      ]);
     },
   });
 
@@ -87,11 +53,11 @@ export function useSawRopeMutation() {
     );
 
   return useMutation(mutationFn, {
-    onMutate: async (variables) => {
-      await queryClient.cancelQueries(['skeins', variables.rope.group]);
+    onMutate: async () => {
+      await queryClient.cancelQueries(['skeins']);
     },
-    onSettled: async (_data, _error, variables) => {
-      await queryClient.invalidateQueries(['skeins', variables.rope.group]);
+    onSettled: async (_data, _error) => {
+      await queryClient.invalidateQueries(['skeins']);
     },
   });
 }
@@ -106,19 +72,25 @@ export function useSawSeamMutation() {
     });
 
   return useMutation(mutationFn, {
-    onMutate: async (variables) => {
-      if ('group' in variables.seam) {
-        await queryClient.cancelQueries(['skeins', variables.seam.group]);
-      } else {
-        await queryClient.cancelQueries(['skeins', window.desk]);
-      }
+    onMutate: async () => {
+      await queryClient.cancelQueries(['skeins']);
     },
-    onSettled: async (_data, _error, variables) => {
-      if ('group' in variables.seam) {
-        await queryClient.invalidateQueries(['skeins', variables.seam.group]);
-      } else {
-        await queryClient.invalidateQueries(['skeins', window.desk]);
-      }
+    onSettled: async (_data, _error) => {
+      await queryClient.invalidateQueries(['skeins']);
     },
   });
+}
+
+export function useHasInviteToGroup(): Skein | undefined {
+  const skeins = useSkeins();
+  if (!skeins.data) {
+    return undefined;
+  }
+
+  return skeins.data.find(
+    (skein) =>
+      skein.top.rope.desk === 'groups' &&
+      skein.top.con.some((con) => con === ' sent you an invite to ') &&
+      skein.unread
+  );
 }

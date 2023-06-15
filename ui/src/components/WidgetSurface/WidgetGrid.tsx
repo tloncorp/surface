@@ -42,6 +42,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       columns,
       rows,
       width,
+
       paddingX,
       paddingY,
     });
