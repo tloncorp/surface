@@ -1,10 +1,12 @@
 import { useSurfaceState } from "@/state/surface";
 import { WidgetPane } from "@/types/surface";
+import { Widget as WidgetConfig } from "@/widgets";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import Widget from "./Widget";
+import WidgetEditor from "./WidgetEditor";
 import { WidgetMenu } from "./WidgetMenu";
 
 const gridSize = 113;
@@ -16,11 +18,11 @@ interface WidgetGridProps {
 }
 
 const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingWidget, setEditingWidget] = useState<WidgetConfig | null>(null);
   const { widgets } = pane;
   const { updatePane } = useSurfaceState();
   const gridRef = useRef<HTMLDivElement>(null);
-
-  console.log(widgets);
 
   const [config, setConfig] = useState<{
     columns: number;
@@ -62,14 +64,49 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
     [id, pane, widgets]
   );
 
+  const handlePressEditWidget = useCallback((widget: WidgetConfig) => {
+    setEditingWidget(widget);
+  }, []);
+
+  const handleWidgetEdited = useCallback(
+    (updatedWidget: WidgetConfig) => {
+      const newWidgets = widgets.map((item) => {
+        console.log(item.id, editingWidget?.id);
+        return item.id === updatedWidget?.id ? updatedWidget : item;
+      });
+      setEditingWidget(null);
+      updatePane(id, {
+        ...pane,
+        widgets: newWidgets,
+      });
+    },
+    [widgets]
+  );
+
   const { children, layouts } = useMemo(() => {
     return {
       children: widgets.map((item, i) => {
-        return <Widget widget={item} key={item.id} />;
+        return (
+          <Widget
+            widget={item}
+            key={item.id}
+            editMode={isEditing}
+            onPressEdit={handlePressEditWidget}
+          />
+        );
       }),
       layouts: widgets.map((item) => item.layout),
     };
-  }, [widgets]);
+  }, [widgets, isEditing, handlePressEditWidget]);
+
+  const handleClickEdit = useCallback(() => {
+    setIsEditing(true);
+  }, []);
+
+  const handleClickDoneEditing = useCallback(() => {
+    setIsEditing(false);
+    setEditingWidget(null);
+  }, []);
 
   return (
     <div
@@ -98,10 +135,29 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       ) : null}
       <footer className="fixed bottom-0 left-0 flex w-full justify-center p-2">
         <div className="flex items-center justify-center space-x-2">
-          <button className="nav-button default-focus">Edit Tab</button>
-          <WidgetMenu id={id} pane={pane} />
+          {isEditing ? (
+            <button
+              className="nav-button default-focus"
+              onClick={handleClickDoneEditing}
+            >
+              Done
+            </button>
+          ) : (
+            <>
+              <button
+                className="nav-button default-focus"
+                onClick={handleClickEdit}
+              >
+                Edit
+              </button>
+              <WidgetMenu id={id} pane={pane} />
+            </>
+          )}
         </div>
       </footer>
+      {editingWidget && (
+        <WidgetEditor widget={editingWidget} onSubmit={handleWidgetEdited} />
+      )}
     </div>
   );
 };

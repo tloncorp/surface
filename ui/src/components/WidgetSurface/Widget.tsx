@@ -1,16 +1,18 @@
-import { WidgetProps } from "@/types/surface";
-import React, { HTMLProps, PropsWithChildren } from "react";
-import widgetDefs from "./widgetDefs";
+import { WidgetProps, Widget as WidgetConfig } from "@/widgets";
+import React, { HTMLProps, PropsWithChildren, useCallback } from "react";
+import { widgets } from "@/widgets";
 
 const Widget = React.forwardRef<
   HTMLDivElement,
-  WidgetProps &
-    // We need to forward a number of props to the underlying div for
-    // compatibility with `react-grid-layout`.
-    // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
-    PropsWithChildren<HTMLProps<HTMLDivElement>>
->(({ widget, ...forwardProps }, ref) => {
-  const def = widgetDefs[widget.type];
+  // We need to forward a number of props to the underlying div for
+  // compatibility with `react-grid-layout`.
+  // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
+  WidgetProps & {
+    editMode: boolean;
+    onPressEdit?: (widget: WidgetConfig<any>) => void;
+  } & PropsWithChildren<HTMLProps<HTMLDivElement>>
+>(({ widget, editMode, onPressEdit, ...forwardProps }, ref) => {
+  const def = widgets[widget.type];
 
   // All values in `react-grid-layout` `Layout`s are specified in grid units, and
   // need to be translated to pixel dimensions to be useful. It's kind of a pain
@@ -23,6 +25,10 @@ const Widget = React.forwardRef<
     w: typeof width === "string" ? parseInt(width) : width ?? 0,
     h: typeof height === "string" ? parseInt(height) : height ?? 0,
   };
+
+  const handlePressEdit = useCallback(() => {
+    onPressEdit?.(widget);
+  }, [onPressEdit, widget]);
 
   if (!def) return <>No renderer found for widget</>;
 
@@ -37,6 +43,12 @@ const Widget = React.forwardRef<
         <def.Component widget={{ ...widget, layout }} />
       ) : (
         "No renderer found for widget type" + widget.type
+      )}
+      {editMode && (
+        <a
+          className="absolute right-0 top-0 h-full w-full"
+          onClick={handlePressEdit}
+        ></a>
       )}
     </div>
   );

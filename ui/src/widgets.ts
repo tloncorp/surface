@@ -32,7 +32,8 @@ export interface Widgets {
   widgets: Widget[];
 }
 
-type WidgetType = keyof typeof widgets; /** should be keys from widget definitions */
+type WidgetType =
+  keyof typeof widgets; /** should be keys from widget definitions */
 
 export interface Widget<Config = any> {
   /** unique id for instance */
@@ -48,9 +49,51 @@ const widgets = {
     name: "Clock",
     description: "Select from a gaggle of faces",
     icon: ClockIcon,
-    params: {},
+    params: {
+      properties: {
+        type: {
+          type: "string",
+          oneOf: [
+            {
+              const: "classic",
+              title: "Classic",
+            },
+            {
+              const: "seasons",
+              title: "Seasons",
+            },
+            {
+              const: "color",
+              title: "Color",
+            },
+            {
+              const: "text",
+              title: "Text",
+            },
+          ],
+        },
+      },
+      allOf: [
+        {
+          if: {
+            properties: {
+              type: {
+                const: "classic",
+              },
+            },
+          },
+          then: {
+            properties: {
+              borderColor: {
+                type: "string",
+              },
+            },
+          },
+        },
+      ],
+    },
     Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 }
+    defaultSize: { w: 2, h: 2 },
   },
   shortcut: {
     id: "shortcut",
@@ -59,7 +102,7 @@ const widgets = {
     icon: AppShortcutIcon,
     params: {},
     Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 }
+    defaultSize: { w: 3, h: 2 },
   },
   reference: {
     id: "reference",
@@ -68,27 +111,27 @@ const widgets = {
     icon: PinRefIcon,
     params: {},
     Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 }
+    defaultSize: { w: 3, h: 2 },
   },
-  'latest-post': {
+  "latest-post": {
     id: "latest-post",
     name: "Latest Post",
     description: "Pin the latest post from a Gallery/Notebook",
     icon: LatestPostIcon,
     params: {},
     Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 }
+    defaultSize: { w: 3, h: 2 },
   },
-  'mini-notifications': {
+  "mini-notifications": {
     id: "mini-notifications",
     name: "Mini Notifications",
     description: "Surface latest notification received",
     icon: MiniNotificationIcon,
     params: {},
     Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 }
+    defaultSize: { w: 3, h: 2 },
   },
-}
+};
 
 const typedWidgets = widgets as { [key in WidgetType]: WidgetDef };
 
