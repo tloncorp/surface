@@ -10,8 +10,9 @@ const Widget = React.forwardRef<
   WidgetProps & {
     editMode?: boolean;
     onPressEdit?: (widget: WidgetConfig<any>) => void;
+    onPressRemove?: (widget: WidgetConfig<any>) => void;
   } & PropsWithChildren<HTMLProps<HTMLDivElement>>
->(({ widget, editMode, onPressEdit, ...forwardProps }, ref) => {
+>(({ widget, editMode, onPressEdit, onPressRemove, ...forwardProps }, ref) => {
   const def = widgets[widget.type];
 
   // All values in `react-grid-layout` `Layout`s are specified in grid units, and
@@ -30,12 +31,17 @@ const Widget = React.forwardRef<
     onPressEdit?.(widget);
   }, [onPressEdit, widget]);
 
+  const handlePressRemove = useCallback(() => {
+    onPressRemove?.(widget);
+  }, [onPressRemove, widget]);
+
   if (!def) return <>No renderer found for widget</>;
 
   return (
     <div
       data-grid={widget.layout}
       ref={ref}
+      className="group"
       {...forwardProps}
       style={{ ...forwardProps.style }}
     >
@@ -45,10 +51,21 @@ const Widget = React.forwardRef<
         "No renderer found for widget type" + widget.type
       )}
       {editMode && (
-        <a
-          className="absolute right-0 top-0 h-full w-full"
-          onClick={handlePressEdit}
-        ></a>
+        <>
+          <a
+            className="absolute -bottom-2 -left-2 -right-2 -top-2 z-10 flex items-center justify-center rounded-2xl"
+            style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+            onClick={handlePressEdit}
+          >
+            <span className="secondary-button">Edit</span>
+          </a>
+          <button
+            onClick={handlePressRemove}
+            className="absolute right-0 top-0 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-xl uppercase"
+          >
+            &times;
+          </button>
+        </>
       )}
     </div>
   );

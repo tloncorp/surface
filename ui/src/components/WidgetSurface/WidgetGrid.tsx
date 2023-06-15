@@ -72,13 +72,22 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   const handleWidgetEdited = useCallback(
     (updatedWidget: WidgetConfig) => {
       const newWidgets = widgets.map((item) => {
-        console.log(item.id, editingWidget?.id);
         return item.id === updatedWidget?.id ? updatedWidget : item;
       });
       setEditingWidget(null);
       updatePane(id, {
         ...pane,
         widgets: newWidgets,
+      });
+    },
+    [widgets]
+  );
+
+  const handlePressRemoveWidget = useCallback(
+    (widget: WidgetConfig) => {
+      updatePane(id, {
+        ...pane,
+        widgets: widgets.filter((item) => item.id !== widget.id),
       });
     },
     [widgets]
@@ -92,6 +101,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
             widget={item}
             key={item.id}
             editMode={isEditing}
+            onPressRemove={handlePressRemoveWidget}
             onPressEdit={handlePressEditWidget}
           />
         );

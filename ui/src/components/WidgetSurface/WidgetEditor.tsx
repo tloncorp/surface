@@ -47,7 +47,11 @@ const WidgetEditor = ({
             <div className="flex flex-1 items-center justify-center">
               <Widget
                 widget={workingWidget}
-                style={{ width: "200px", height: "200px" }}
+                style={{
+                  width: "200px",
+                  height: "200px",
+                  position: "relative",
+                }}
               />
             </div>
           </div>
