@@ -11,12 +11,14 @@ export interface Surface {
 export type Pane = AppPane | WidgetPane;
 
 export interface AppPane {
+  id: string;
   title: string;
   type: "app";
   path: string;
 }
 
 export interface WidgetPane {
+  id: string;
   title: string;
   type: "widget";
   widgets: Widget[];

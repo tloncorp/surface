@@ -50,7 +50,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
         };
       })
     });
-  }, []);
+  }, [id, pane, widgets]);
 
   const { children, layouts } = useMemo(() => {
     return {

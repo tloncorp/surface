@@ -1,9 +1,8 @@
 import { useCallback } from "react";
 import * as Dropdown from '@radix-ui/react-dropdown-menu';
-import { getAppHref, normalizeUrbitColor } from "@/logic/utils";
+import { getAppHref } from "@/logic/utils";
 import { Pane } from "@/types/surface";
 import { ChargeWithDesk, useInstalledApps } from "@/state/docket";
-import AddIcon from "./icons/AddIcon";
 import CaretDownIcon from "./icons/CaretDownIcon";
 import OpenAppIcon from "./icons/OpenAppIcon";
 import { useSurfaceState } from "@/state/surface";
@@ -22,6 +21,7 @@ const SurfaceMenu = ({
 
   const onAppSelected = useCallback((app: ChargeWithDesk) => {
     addSurfaceWithPane({
+      id: `${app.title}-${Date.now()}`,
       title: app.title,
       type: 'app',
       path: getAppHref(app.href),
@@ -29,7 +29,7 @@ const SurfaceMenu = ({
   }, []);
 
   const onNewSurfaceSelected = useCallback(() => {
-    addSurfaceWithPane({ title: 'New Tab', type: 'widget', widgets: [] });
+    addSurfaceWithPane({ id: Date.now().toString(),title: 'New Tab', type: 'widget', widgets: [] });
   }, []);
 
   return (

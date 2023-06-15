@@ -162,10 +162,9 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
       return;
     }
 
-    debugger;
     const newSurface = {
       ...surface,
-      panes: surface.panes.length > 0 ? surface.panes.map((p) => p === pane ? pane : p) : [pane],
+      panes: surface.panes.length > 0 ? surface.panes.map((p) => p.id === pane.id ? pane : p) : [pane],
     };
     set((draft) => ({ ...updateSurfaces(draft.surfaces.map((surface) => surface.id === id ? newSurface : surface)) }));
   },
