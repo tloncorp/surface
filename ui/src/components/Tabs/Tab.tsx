@@ -62,7 +62,7 @@ const Tab = ({
                 }
               )}
             >
-              <span>{surface.title || surface.panes.map(p => p.title).join(' + ')}</span>
+              <span className='whitespace-nowrap'>{surface.title || surface.panes.map(p => p.title).join(' + ')}</span>
               {surface.panes.length > 1 && (
                 <button
                   className="rounded bg-gray-100 px-2 py-1 text-xs uppercase"

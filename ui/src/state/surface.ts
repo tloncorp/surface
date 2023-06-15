@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist, subscribeWithSelector} from "zustand/middleware";
 import { share, isSupported } from "shared-zustand";
-import { Surface } from "@/types/surface";
+import { Pane, Surface, WidgetPane } from "@/types/surface";
 import { getQueryParam } from "@/logic/utils";
+import { Widget, WidgetDef } from "@/widgets";
 
 interface SurfaceState {
   surfaces: Surface[];
@@ -10,6 +11,7 @@ interface SurfaceState {
   activeSurface: string | null;
   switchSurface: (id: string) => void;
   addSurface: (surface: Surface) => void;
+  addSurfaceWithPane: (pane: Pane) => void;
   removeSurface: (id: string) => void;
   splitSurface: (id: string) => void;
   /**
@@ -19,6 +21,14 @@ interface SurfaceState {
    */
   combineSurfaces: (sourceId: string, targetId: string) => void;
   moveSurface: (sourceIndex: number, targetIndex: number) => void;
+  /**
+   * Adds widget to specified pane in surface.
+   * @param id Surface id
+   * @param pane Pane to add widget to
+   * @param widget Widget to add
+   */
+  addWidget: <Config>(id: string, pane: WidgetPane, widget: WidgetDef<Config>) => void;
+  updatePane: (id: string, pane: Pane) => void;
 }
 
 function updateSurfaces(surfaces: Surface[]) {
@@ -38,6 +48,11 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
     set({ activeSurface: id });
   },
   addSurface: (surface) => {
+    set((draft) => ({ ...updateSurfaces([...draft.surfaces, surface]), activeSurface: surface.id }))
+  },
+  addSurfaceWithPane: (pane) => {
+    const id = pane.title + new Date().getTime();
+    const surface: Surface = { id, panes: [pane], addedAt: new Date().getTime() };
     set((draft) => ({ ...updateSurfaces([...draft.surfaces, surface]), activeSurface: surface.id }))
   },
   removeSurface: (id) => {
@@ -118,6 +133,40 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
     const surface = newSurfaces.splice(sourceIndex, 1)[0];
     newSurfaces.splice(targetIndex, 0, surface);
     set({ ...updateSurfaces(newSurfaces) });
+  },
+  addWidget: (id, pane, widget) => {
+    const wId = `${widget.id}-${Date.now()}`;
+    const newWidget: Widget = {
+      id: wId,
+      type: widget.id,
+      layout: {
+        i: wId,
+        x: 0,
+        y: 0,
+        ...widget.defaultSize,
+      },
+      config: {
+        type: "classic",
+      }
+    };
+    get().updatePane(id, {
+      ...pane,
+      widgets: [...pane.widgets, newWidget],
+    })
+  },
+  updatePane: (id, pane) => {
+    const surface = get().surfaces.find((surface) => surface.id === id);
+
+    if (!surface) {
+      console.warn("attempted to add widget to non-existent surface", id);
+      return;
+    }
+
+    const newSurface = {
+      ...surface,
+      panes: surface.panes.length > 0 ? surface.panes.map((p) => p.id === pane.id ? pane : p) : [pane],
+    };
+    set((draft) => ({ ...updateSurfaces(draft.surfaces.map((surface) => surface.id === id ? newSurface : surface)) }));
   },
 }), {
   name: "surface-state",
