@@ -1,11 +1,6 @@
 import { useState, useCallback } from 'react';
 import bigInt, { BigInteger } from 'big-integer';
-import {
-  BigIntOrderedMap,
-  Docket,
-  DocketHref,
-  Treaty,
-} from '@/gear';
+import { BigIntOrderedMap, Docket, DocketHref, Treaty } from '@/gear';
 import { formatUv, unixToDa } from '@urbit/aura';
 import anyAscii from 'any-ascii';
 import { format, differenceInDays, endOfToday } from 'date-fns';
@@ -13,6 +8,8 @@ import _ from 'lodash';
 import emojiRegex from 'emoji-regex';
 import { hsla, parseToHsla, parseToRgba } from 'color2k';
 import { useCopyToClipboard } from 'usehooks-ts';
+import {DiaryInline, DiaryListing, NoteContent, Verse, VerseBlock, VerseInline} from '@/types/diary';
+import {Bold, Italics, Strikethrough} from '@/types/content';
 
 export const isTalk = import.meta.env.VITE_APP === 'chat';
 
@@ -22,6 +19,14 @@ export function nestToFlag(nest: string): [string, string] {
   return [app, rest.join('/')];
 }
 
+export function getFlagParts(flag: string) {
+  const parts = flag.split('/');
+
+  return {
+    ship: parts[0],
+    name: parts[1]
+  };
+}
 
 /**
  * Processes a string to make it `@tas` compatible
@@ -86,7 +91,7 @@ export function makePrettyDayAndTime(date: Date): DayTimeDisplay {
     diff,
     time,
     day,
-    asString: `${day} • ${time}`,
+    asString: `${day} • ${time}`
   };
 }
 
@@ -105,14 +110,14 @@ export function makePrettyDayAndDateAndTime(date: Date): DateDayTimeDisplay {
     return {
       ...dayTime,
       fullDate,
-      asString: `${fullDate} • ${dayTime.time}`,
+      asString: `${fullDate} • ${dayTime.time}`
     };
   }
 
   return {
     ...dayTime,
     fullDate,
-    asString: `${dayTime.asString} • ${fullDate}`,
+    asString: `${dayTime.asString} • ${fullDate}`
   };
 }
 
@@ -168,7 +173,6 @@ export function newUv(seed = Date.now()) {
   return formatUv(unixToDa(seed));
 }
 
-
 export function pluralRank(
   rank: 'galaxy' | 'star' | 'planet' | 'moon' | 'comet'
 ) {
@@ -203,7 +207,7 @@ export function toTitleCase(s: string): string {
   }
   return s
     .split(' ')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ');
 }
 
@@ -278,7 +282,7 @@ export function useCopy(copied: string) {
 
   const doCopy = useCallback(async () => {
     let success = false;
-      success = await copy(copied);
+    success = await copy(copied);
 
     setDidCopy(success);
 
@@ -436,7 +440,7 @@ const groups = [
   'channel',
   'join',
   'cabal',
-  'fleet',
+  'fleet'
 ];
 const misc = [
   'saw-seam',
@@ -446,7 +450,7 @@ const misc = [
   'put-bucket',
   'del-bucket',
   'put-entry',
-  'del-entry',
+  'del-entry'
 ];
 const wrappers = ['update', 'diff', 'delta'];
 const general = [
@@ -459,7 +463,7 @@ const general = [
   'add-feel',
   'del-feel',
   'meta',
-  'init',
+  'init'
 ];
 
 export function actionDrill(
@@ -480,7 +484,7 @@ export function actionDrill(
     const deeper =
       val &&
       typeof val === 'object' &&
-      Object.keys(val).some((k) => allowed.includes(k));
+      Object.keys(val).some(k => allowed.includes(k));
 
     if (deeper && level < 4) {
       // continue deeper and skip the key if just a wrapper, otherwise add on to path
@@ -496,7 +500,7 @@ export function actionDrill(
     }
   });
 
-  return keys.filter((k) => k !== '');
+  return keys.filter(k => k !== '');
 }
 
 export const getQueryParam = (key: string) => {
@@ -511,7 +515,211 @@ export const setQueryParam = (key: string, value: string | null) => {
   } else {
     searchParams.delete(key);
   }
-  const url = window.location.pathname + "?" + searchParams.toString();
+  const url = window.location.pathname + '?' + searchParams.toString();
   // We use `replaceState` so that the browser history doesn't get cluttered
-  window.history.replaceState(null, "", url);
+  window.history.replaceState(null, '', url);
 };
+
+export function truncateProse(
+  content: NoteContent,
+  maxCharacters: number
+): NoteContent {
+  const truncate = (
+    [head, ...tail]: DiaryInline[],
+    remainingChars: number,
+    acc: DiaryInline[]
+  ): { truncatedItems: DiaryInline[]; remainingChars: number } => {
+    if (!head || remainingChars <= 0) {
+      return { truncatedItems: acc, remainingChars };
+    }
+
+    let willBeEnd = false;
+
+    if (typeof head === 'string') {
+      const truncatedString = head.slice(0, remainingChars);
+      willBeEnd = remainingChars - truncatedString.length <= 0;
+      return truncate(tail, remainingChars - truncatedString.length, [
+        ...acc,
+        truncatedString.concat(willBeEnd ? '...' : '')
+      ]);
+    }
+
+    if ('bold' in head && typeof head.bold[0] === 'string') {
+      const truncatedString = (head.bold[0] as string).slice(0, remainingChars);
+      willBeEnd = remainingChars - truncatedString.length <= 0;
+      const truncatedBold: Bold = {
+        bold: [truncatedString.concat(willBeEnd ? '...' : '')]
+      };
+      return truncate(tail, remainingChars - truncatedString.length, [
+        ...acc,
+        truncatedBold
+      ]);
+    }
+
+    if ('italics' in head && typeof head.italics[0] === 'string') {
+      const truncatedString = (head.italics[0] as string).slice(
+        0,
+        remainingChars
+      );
+      willBeEnd = remainingChars - truncatedString.length <= 0;
+      const truncatedItalics: Italics = {
+        italics: [truncatedString.concat(willBeEnd ? '...' : '')]
+      };
+      return truncate(tail, remainingChars - truncatedString.length, [
+        ...acc,
+        truncatedItalics
+      ]);
+    }
+
+    if ('strike' in head && typeof head.strike[0] === 'string') {
+      const truncatedString = (head.strike[0] as string).slice(
+        0,
+        remainingChars
+      );
+      willBeEnd = remainingChars - truncatedString.length <= 0;
+      const truncatedStrike: Strikethrough = {
+        strike: [truncatedString.concat(willBeEnd ? '...' : '')]
+      };
+      return truncate(tail, remainingChars - truncatedString.length, [
+        ...acc,
+        truncatedStrike
+      ]);
+    }
+
+    return truncate(tail, remainingChars, [...acc, head]);
+  };
+
+  let remainingChars = maxCharacters;
+  let remainingImages = 1;
+
+  const truncatedContent: NoteContent = content
+    .map((verse: Verse): Verse => {
+      if ('inline' in verse) {
+        const lengthBefore = remainingChars;
+        const { truncatedItems, remainingChars: updatedRemainingChars } =
+          truncate(verse.inline, remainingChars, []);
+        const truncatedVerse: VerseInline = {
+          inline: truncatedItems
+        };
+
+        remainingChars -= lengthBefore - updatedRemainingChars;
+        return truncatedVerse;
+      }
+
+      if ('block' in verse) {
+        if (remainingChars <= 0) {
+          return {
+            inline: ['']
+          };
+        }
+
+        if ('cite' in verse.block) {
+          return {
+            inline: ['']
+          };
+        }
+
+        if ('image' in verse.block) {
+          if (remainingImages <= 0) {
+            return {
+              inline: ['']
+            };
+          }
+
+          remainingImages -= 1;
+          return verse;
+        }
+
+        if ('header' in verse.block) {
+          // apparently users can add headers if they paste in content from elsewhere
+          const lengthBefore = remainingChars;
+          const { truncatedItems, remainingChars: updatedRemainingChars } =
+            truncate(verse.block.header.content, remainingChars, []);
+          const truncatedVerse: VerseBlock = {
+            block: {
+              header: {
+                ...verse.block.header,
+                content: truncatedItems
+              }
+            }
+          };
+          remainingChars = lengthBefore - updatedRemainingChars;
+          return truncatedVerse;
+        }
+
+        if (
+          'listing' in verse.block &&
+          'list' in verse.block.listing &&
+          'items' in verse.block.listing.list
+        ) {
+          const lengthBefore = remainingChars;
+          const {
+            truncatedListItems,
+            remainingChars: remainingCharsAfterList
+          } = verse.block.listing.list.items.reduce(
+            (
+              accumulator: {
+                truncatedListItems: DiaryListing[];
+                remainingChars: number;
+              },
+              listing: DiaryListing
+            ) => {
+              if ('item' in listing) {
+                const lengthBeforeList = accumulator.remainingChars;
+
+                if (lengthBeforeList <= 0) {
+                  return accumulator;
+                }
+
+                const {
+                  truncatedItems,
+                  remainingChars: updatedRemainingChars
+                } = truncate(listing.item, lengthBeforeList, []);
+                const truncatedListing = {
+                  item: truncatedItems
+                };
+                const remainingCharsInReducer =
+                  lengthBeforeList - updatedRemainingChars;
+                return {
+                  truncatedListItems: [
+                    ...accumulator.truncatedListItems,
+                    truncatedListing
+                  ],
+                  remainingChars: remainingCharsInReducer
+                };
+              }
+              return accumulator;
+            },
+            { truncatedListItems: [], remainingChars }
+          );
+
+          remainingChars = remainingCharsAfterList;
+          const truncatedVerse: VerseBlock = {
+            block: {
+              listing: {
+                list: {
+                  ...verse.block.listing.list,
+                  items: truncatedListItems
+                }
+              }
+            }
+          };
+          remainingChars -= lengthBefore - remainingChars;
+          return truncatedVerse;
+        }
+
+        return verse;
+      }
+
+      return verse;
+    })
+    .filter((verse: Verse): boolean => {
+      if ('inline' in verse) {
+        return verse.inline.length > 0;
+      }
+      return true;
+    });
+
+  return truncatedContent;
+}
+

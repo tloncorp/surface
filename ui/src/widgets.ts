@@ -6,6 +6,9 @@ import { AppShortcutIcon } from "./components/icons/AppShortcutIcon";
 import { PinRefIcon } from "./components/icons/PinRefIcon";
 import { LatestPostIcon } from "./components/icons/LatestPostIcon";
 import { MiniNotificationIcon } from "./components/icons/MiniNotificationIcon";
+import AppTileWidget from "./components/WidgetSurface/AppTileWidget/AppTileWidget";
+import NoteWidget from "./components/WidgetSurface/NoteWidget/NoteWidget";
+import ActivityWidget from "./components/WidgetSurface/ActivityWidget/ActivityWidget";
 
 export interface WidgetProps<Config = any> {
   widget: Widget<Config>;
@@ -101,8 +104,8 @@ const widgets = {
     description: "Pin an app to your Landscape",
     icon: AppShortcutIcon,
     params: {},
-    Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 },
+    Component: AppTileWidget,
+    defaultSize: { w: 2, h: 2 },
   },
   reference: {
     id: "reference",
@@ -119,8 +122,8 @@ const widgets = {
     description: "Pin the latest post from a Gallery/Notebook",
     icon: LatestPostIcon,
     params: {},
-    Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 },
+    Component: NoteWidget,
+    defaultSize: { w: 4, h: 5 },
   },
   "mini-notifications": {
     id: "mini-notifications",
@@ -128,8 +131,8 @@ const widgets = {
     description: "Surface latest notification received",
     icon: MiniNotificationIcon,
     params: {},
-    Component: ClockWidget,
-    defaultSize: { w: 3, h: 2 },
+    Component: ActivityWidget,
+    defaultSize: { w: 4, h: 4 },
   },
 };
 

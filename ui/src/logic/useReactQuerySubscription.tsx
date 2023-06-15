@@ -3,7 +3,7 @@ import {
   QueryKey,
   useQuery,
   useQueryClient,
-  UseQueryOptions,
+  UseQueryOptions
 } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import api from '@/api';
@@ -17,7 +17,7 @@ export default function useReactQuerySubscription<Data, Event>({
   scryApp = app,
   priority = 3,
   onEvent,
-  options,
+  options
 }: {
   queryKey: QueryKey;
   app: string;
@@ -39,24 +39,21 @@ export default function useReactQuerySubscription<Data, Event>({
     )
   );
 
-  const fetchData = async () =>
-    useSchedulerStore.getState().wait(
-      async () =>
-        api.scry<Data>({
-          app: scryApp,
-          path: scry,
-        }),
-      priority
-    );
+  const fetchData = async () => {
+    return api.scry<Data>({
+      app: scryApp,
+      path: scry
+    });
+  };
 
   useEffect(() => {
     api.subscribe({
       app,
       path,
-      event: (event) => {
+      event: event => {
         onEvent && onEvent(event);
         invalidate.current();
-      },
+      }
     });
   }, [app, path, queryClient, queryKey]);
 
