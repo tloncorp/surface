@@ -64,7 +64,6 @@ const calculateTime = (now: Date) => {
   const minuteAngle = (minutes + seconds / 60) * 6 * (Math.PI / 180);
   const secondAngle =
     (seconds + now.getMilliseconds() / 1000) * 6 * (Math.PI / 180);
-
   return {
     date: now,
     basic: {
