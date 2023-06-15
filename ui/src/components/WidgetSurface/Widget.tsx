@@ -8,7 +8,7 @@ const Widget = React.forwardRef<
   // compatibility with `react-grid-layout`.
   // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
   WidgetProps & {
-    editMode: boolean;
+    editMode?: boolean;
     onPressEdit?: (widget: WidgetConfig<any>) => void;
   } & PropsWithChildren<HTMLProps<HTMLDivElement>>
 >(({ widget, editMode, onPressEdit, ...forwardProps }, ref) => {

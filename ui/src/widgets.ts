@@ -56,6 +56,7 @@ const widgets = {
       properties: {
         type: {
           type: "string",
+          title: "Clock Type",
           oneOf: [
             {
               const: "classic",
