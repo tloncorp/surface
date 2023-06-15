@@ -12,10 +12,12 @@ interface WidgetMenuProps {
 export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
   const { addWidget } = useSurfaceState();
 
-  const onWidgetSelected = useCallback((widget: WidgetDef) => {
-    console.log({ widget });
-    addWidget(id, pane, widget);
-  }, []);
+  const onWidgetSelected = useCallback(
+    (widget: WidgetDef) => {
+      addWidget(id, pane, widget);
+    },
+    [pane, id]
+  );
 
   return (
     <Dropdown.Root>
@@ -51,4 +53,3 @@ export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
     </Dropdown.Root>
   );
 };
-
