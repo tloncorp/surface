@@ -1,4 +1,4 @@
-import { Layout } from "react-grid-layout";
+import { Widget } from "@/widgets";
 
 export interface Surface {
   id: string;
@@ -20,32 +20,4 @@ export interface WidgetPane {
   title: string;
   type: "widget";
   widgets: Widget[];
-}
-
-export interface WidgetProps<Config = any> {
-  widget: Widget<Config>;
-}
-
-export interface WidgetDef {
-  /** Unique id for this definition */
-  id: string;
-  /** Available config parameters, could be json-schema? */
-  params: {};
-  /** Component used to render this def */
-  Component: React.ComponentType<WidgetProps>;
-}
-
-export interface Widgets {
-  type: "widgets";
-  widgets: Widget[];
-}
-
-type WidgetType = string; /** should be keys from widget definitions */
-
-export interface Widget<Config = any> {
-  /** unique id for instance */
-  id: string;
-  type: WidgetType;
-  layout: Layout;
-  config: Config;
 }

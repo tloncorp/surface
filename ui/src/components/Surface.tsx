@@ -6,6 +6,7 @@ import { useSurfaceState } from '@/state/surface';
 import WidgetGrid from './WidgetSurface/WidgetGrid';
 
 interface SurfacePaneProps {
+  id: string;
   pane: Pane;
   isActive: boolean;
 }
@@ -14,6 +15,7 @@ interface SurfacePaneProps {
  * Responsible for rendering an app in an iframe.
  */
 const SurfacePane = ({
+  id,
   pane,
   isActive,
 }: SurfacePaneProps) => {
@@ -54,7 +56,7 @@ const SurfacePane = ({
         />
       )
       : (
-        <WidgetGrid />
+        <WidgetGrid id={id} pane={pane}/>
       )}
     </div>
   ) : null;
@@ -72,6 +74,7 @@ const Surface = ({ surface }: SurfaceProps) => {
     <div className={cn("absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0", isActive ? 'z-30' : 'z-20' )}>
       {surface.panes.map((pane, index) => (
         <SurfacePane
+          id={surface.id}
           pane={pane}
           isActive={isActive}
           key={index}

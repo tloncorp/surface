@@ -1,20 +1,25 @@
-import { Widget as WidgetConfig } from "@/types/surface";
+import { WidgetPane } from "@/types/surface";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import ReactGridLayout, { Layout } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import Widget from "./Widget";
+import { WidgetMenu } from "./WidgetMenu";
+import { useSurfaceState } from "@/state/surface";
 
 const gridSize = 100;
 
-const defaultSize = {
-  w: 3,
-  h: 2,
-};
+interface WidgetGridProps {
+  id: string;
+  pane: WidgetPane;
+}
 
-const WidgetGrid = () => {
-  const [items, setItems] = useState<WidgetConfig[]>([]);
+const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
+  const { widgets } = pane;
+  const { updatePane } = useSurfaceState();
   const gridRef = useRef<HTMLDivElement>(null);
+
+  console.log(widgets);
 
   const [config, setConfig] = useState<{
     columns: number;
@@ -36,47 +41,28 @@ const WidgetGrid = () => {
   }, []);
 
   const handleLayoutChange = useCallback((newLayouts: Layout[]) => {
-    setItems((items) => {
-      const newItems = items.map((item, i) => {
+    updatePane(id, {
+      ...pane,
+      widgets: widgets.map((item, i) => {
         return {
           ...item,
           layout: { ...newLayouts[i] },
         };
-      });
-      return newItems;
+      })
     });
   }, []);
 
   const { children, layouts } = useMemo(() => {
     return {
-      children: items.map((item, i) => {
+      children: widgets.map((item, i) => {
         return <Widget widget={item} key={item.id} />;
       }),
-      layouts: items.map((item) => item.layout),
+      layouts: widgets.map((item) => item.layout),
     };
-  }, [items]);
-
-  const handlePressAddClock = useCallback(() => {
-    const id = items.length.toString();
-    const clockWidget: WidgetConfig = {
-      id,
-      type: "clock",
-      layout: {
-        ...defaultSize,
-        x: 0,
-        y: 0,
-        i: id,
-      },
-      config: {
-        type: "classic",
-      },
-    };
-    setItems((items) => [...items, clockWidget]);
-  }, [items]);
+  }, [widgets]);
 
   return (
-    <div ref={gridRef} className="flex h-full w-full overflow-hidden">
-      <a onClick={handlePressAddClock}>Add Clock</a>
+    <div ref={gridRef} className="relative flex h-full w-full overflow-hidden">
       {config ? (
         <ReactGridLayout
           className="h-full w-full"
@@ -94,6 +80,12 @@ const WidgetGrid = () => {
           {children}
         </ReactGridLayout>
       ) : null}
+      <footer className="fixed bottom-0 left-0 w-full flex justify-center p-2">
+        <div className="flex items-center justify-center space-x-2">
+          <button className="nav-button default-focus">Edit Tab</button>
+          <WidgetMenu id={id} pane={pane} />
+        </div>
+      </footer>
     </div>
   );
 };

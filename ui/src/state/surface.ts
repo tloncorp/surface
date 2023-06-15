@@ -1,8 +1,9 @@
 import { create } from "zustand";
 import { persist, subscribeWithSelector} from "zustand/middleware";
 import { share, isSupported } from "shared-zustand";
-import { Pane, Surface } from "@/types/surface";
+import { Pane, Surface, WidgetPane } from "@/types/surface";
 import { getQueryParam } from "@/logic/utils";
+import { Widget, WidgetDef } from "@/widgets";
 
 interface SurfaceState {
   surfaces: Surface[];
@@ -20,6 +21,14 @@ interface SurfaceState {
    */
   combineSurfaces: (sourceId: string, targetId: string) => void;
   moveSurface: (sourceIndex: number, targetIndex: number) => void;
+  /**
+   * Adds widget to specified pane in surface.
+   * @param id Surface id
+   * @param pane Pane to add widget to
+   * @param widget Widget to add
+   */
+  addWidget: <Config>(id: string, pane: WidgetPane, widget: WidgetDef<Config>) => void;
+  updatePane: (id: string, pane: Pane) => void;
 }
 
 function updateSurfaces(surfaces: Surface[]) {
@@ -124,6 +133,41 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
     const surface = newSurfaces.splice(sourceIndex, 1)[0];
     newSurfaces.splice(targetIndex, 0, surface);
     set({ ...updateSurfaces(newSurfaces) });
+  },
+  addWidget: (id, pane, widget) => {
+    const wId = `${widget.id}-${Date.now()}`;
+    const newWidget: Widget = {
+      id: wId,
+      type: widget.id,
+      layout: {
+        i: wId,
+        x: 0,
+        y: 0,
+        ...widget.defaultSize,
+      },
+      config: {
+        type: "classic",
+      }
+    };
+    get().updatePane(id, {
+      ...pane,
+      widgets: [...pane.widgets, newWidget],
+    })
+  },
+  updatePane: (id, pane) => {
+    const surface = get().surfaces.find((surface) => surface.id === id);
+
+    if (!surface) {
+      console.warn("attempted to add widget to non-existent surface", id);
+      return;
+    }
+
+    debugger;
+    const newSurface = {
+      ...surface,
+      panes: surface.panes.length > 0 ? surface.panes.map((p) => p === pane ? pane : p) : [pane],
+    };
+    set((draft) => ({ ...updateSurfaces(draft.surfaces.map((surface) => surface.id === id ? newSurface : surface)) }));
   },
 }), {
   name: "surface-state",
