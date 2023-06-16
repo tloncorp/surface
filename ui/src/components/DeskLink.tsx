@@ -1,5 +1,5 @@
 import React, { ReactNode, useCallback } from 'react';
-import { ChargeWithDesk, useCharge } from '../state/docket';
+import { ChargeWithDesk, useCharge } from '@/state/docket';
 import { getAppHref } from '@/logic/utils';
 import { useSurfaceState } from '@/state/surface';
 
@@ -8,6 +8,7 @@ interface DeskLinkProps extends React.AnchorHTMLAttributes<any> {
   to?: string;
   children?: ReactNode;
   className?: string;
+  disabled?: boolean;
 }
 
 export function DeskLink({
@@ -15,16 +16,17 @@ export function DeskLink({
   className,
   desk,
   to = '',
+  disabled = false,
   ...rest
 }: DeskLinkProps) {
   const charge = useCharge(desk);
   const { addSurfaceWithPane } = useSurfaceState();
-  const onAppSelected = useCallback((app: ChargeWithDesk) => {
+  const onSelected = useCallback((app: ChargeWithDesk) => {
     addSurfaceWithPane({
       id: `${app.title}-${Date.now()}`,
       title: app.title,
       type: 'app',
-      path: getAppHref(app.href)
+      path: `${getAppHref(app.href)}/${to}`
     });
   }, []);
 
@@ -33,7 +35,9 @@ export function DeskLink({
       className={className}
       {...rest}
       onClick={event => {
-        onAppSelected(charge);
+        if (!disabled) {
+          onSelected(charge);
+        }
         if (rest.onClick) {
           rest.onClick(event);
         }
