@@ -1,9 +1,9 @@
 import { Widget as WidgetConfig, WidgetProps } from "@/widgets";
+import Form, { IChangeEvent } from "@rjsf/core";
+import { RJSFValidationError, UiSchema } from "@rjsf/utils";
 import validator from "@rjsf/validator-ajv8";
-import Form from "@rjsf/core";
-import { FormEvent, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { widgets } from "../../widgets";
-import { UiSchema } from "@rjsf/utils";
 import Widget from "./Widget";
 
 const WidgetEditor = ({
@@ -17,22 +17,22 @@ const WidgetEditor = ({
   const definition = widgets[widget.type];
   const [workingWidget, setWorkingWidget] = useState(widget);
 
-  const handleChange = useCallback((e: FormEvent<any>) => {
+  const handleChange = useCallback((e: IChangeEvent) => {
     setWorkingWidget({
       ...workingWidget,
       config: e.formData,
     });
   }, []);
 
-  const handleSubmit = useCallback((e: { formData: any }) => {
+  const handleSubmit = useCallback((e: IChangeEvent) => {
     onSubmit?.({
       ...widget,
       config: e.formData,
     });
   }, []);
 
-  const handleError = useCallback((e: FormEvent) => {
-    console.log("error", e);
+  const handleError = useCallback((errors: RJSFValidationError[]) => {
+    console.log("error", errors);
   }, []);
 
   return (
