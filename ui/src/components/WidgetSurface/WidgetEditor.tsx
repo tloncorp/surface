@@ -20,7 +20,6 @@ const WidgetEditor = ({
 }) => {
   const definition = widgets[widget.type];
   const [workingWidget, setWorkingWidget] = useState(widget);
-  console.log({ widget, workingWidget, definition });
 
   const handleChange = useCallback((e: FormEvent<any>) => {
     setWorkingWidget({
@@ -30,7 +29,6 @@ const WidgetEditor = ({
   }, []);
 
   const handleSubmit = useCallback((e: { formData: any }) => {
-    console.log({ widget, formData: e.formData });
     onSubmit?.({
       ...widget,
       config: e.formData
