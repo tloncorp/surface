@@ -1,6 +1,12 @@
-import { WidgetProps, Widget as WidgetConfig } from "@/widgets";
-import React, { HTMLProps, PropsWithChildren, useCallback } from "react";
-import { widgets } from "@/widgets";
+import { WidgetProps, Widget as WidgetConfig } from '@/widgets';
+import React, {
+  HTMLProps,
+  PropsWithChildren,
+  useCallback,
+  useState
+} from 'react';
+import { widgets } from '@/widgets';
+import WidgetEditor from './WidgetEditor';
 
 const Widget = React.forwardRef<
   HTMLDivElement,
@@ -9,11 +15,11 @@ const Widget = React.forwardRef<
   // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
   WidgetProps & {
     editMode?: boolean;
-    onPressEdit?: (widget: WidgetConfig<any>) => void;
     onPressRemove?: (widget: WidgetConfig<any>) => void;
   } & PropsWithChildren<HTMLProps<HTMLDivElement>>
->(({ widget, editMode, onPressEdit, onPressRemove, ...forwardProps }, ref) => {
+>(({ widget, editMode, onPressRemove, ...forwardProps }, ref) => {
   const def = widgets[widget.type];
+  const [editingWidget, setEditingWidget] = useState(false);
 
   // All values in `react-grid-layout` `Layout`s are specified in grid units, and
   // need to be translated to pixel dimensions to be useful. It's kind of a pain
@@ -23,13 +29,9 @@ const Widget = React.forwardRef<
   const { width, height } = forwardProps.style ?? { width: 0, height: 0 };
   const layout = {
     ...widget.layout,
-    w: typeof width === "string" ? parseInt(width) : width ?? 0,
-    h: typeof height === "string" ? parseInt(height) : height ?? 0,
+    w: typeof width === 'string' ? parseInt(width) : width ?? 0,
+    h: typeof height === 'string' ? parseInt(height) : height ?? 0
   };
-
-  const handlePressEdit = useCallback(() => {
-    onPressEdit?.(widget);
-  }, [onPressEdit, widget]);
 
   const handlePressRemove = useCallback(() => {
     onPressRemove?.(widget);
@@ -46,16 +48,22 @@ const Widget = React.forwardRef<
       style={{ ...forwardProps.style }}
     >
       {def ? (
-        <def.Component widget={{ ...widget, layout }} />
+        <def.Component
+          widget={widget}
+          editingWidget={editingWidget}
+          setEditingWidget={setEditingWidget}
+          // the clock widget needs these layout values
+          layout={layout}
+        />
       ) : (
-        "No renderer found for widget type" + widget.type
+        'No renderer found for widget type' + widget.type
       )}
-      {editMode && (
+      {editMode && !editingWidget && (
         <>
           <a
             className="absolute -bottom-2 -left-2 -right-2 -top-2 z-10 flex items-center justify-center rounded-2xl"
-            style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
-            onClick={handlePressEdit}
+            style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
+            onClick={() => setEditingWidget(true)}
           >
             <span className="secondary-button">Edit</span>
           </a>
