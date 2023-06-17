@@ -1,10 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { WidgetProps } from "@/widgets";
 import ClassicClock from "./ClassicClock";
 import ColorClock from "./ColorClock";
 import SeasonClock from "./SeasonClock";
 import TextClock from "./TextClock";
-import useTime from "./useTime";
-import { WidgetProps } from "@/widgets";
 
 const ClockWidget = ({
   widget,

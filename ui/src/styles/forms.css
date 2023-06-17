@@ -1,0 +1,111 @@
+.rjsf {
+  @apply gap-2 pb-2 accent-blue-500;
+
+  .form-control {
+    @apply rounded;
+  }
+
+  .form-group {
+    flex: 1;
+  }
+
+  input:not([type="color"]) {
+    @apply input;
+  }
+
+  label,
+  legend {
+    @apply mb-1 block font-semibold;
+  }
+
+  legend {
+    /* Apparently this is the only reasonable way to prevent legend overlapping fieldset border??? */
+    float: left;
+    padding: 0;
+    margin: 0;
+  }
+
+  select {
+    @apply block w-full rounded-md border border-gray-300 p-2;
+    appearance: none;
+  }
+
+  fieldset fieldset {
+    @apply gap-2 overflow-hidden rounded-lg border p-3;
+  }
+
+  .field-object {
+    @apply flex flex-col gap-2;
+  }
+
+  fieldset fieldset legend {
+    @apply mb-3;
+    float: left;
+  }
+
+  fieldset {
+    @apply block flex flex-col gap-4;
+  }
+
+  > div {
+    @apply pb-8;
+  }
+
+  /* Color input */
+
+  .checkbox label {
+    @apply flex flex-row items-center gap-2;
+  }
+
+  .checkbox input {
+    @apply h-6 w-6;
+  }
+
+  .form-group:has(> input[type="color"]) {
+    @apply flex flex-row-reverse items-center justify-center gap-2 self-start;
+
+    label {
+      margin: 0;
+    }
+  }
+
+  input[type="color"] {
+    @apply h-6 w-6 overflow-hidden rounded-full;
+  }
+
+  ::-webkit-color-swatch-wrapper {
+    padding: 0;
+    margin: 0;
+    border: 0;
+    outline: 0;
+  }
+
+  ::-webkit-color-swatch-wrapper:focus {
+    outline: 0;
+  }
+
+  ::-webkit-color-swatch {
+    border: 0;
+    outline: 0;
+  }
+
+  /* Range input */
+
+  .field-range-wrapper {
+    @apply flex items-center gap-2;
+  }
+
+  .field-range-wrapper input {
+    @apply flex-1 p-0;
+  }
+
+  .field-range-wrapper span {
+    @apply font-semibold text-gray-600;
+  }
+
+  /* Boolean input */
+
+  .field-boolean {
+    @apply flex items-center gap-2;
+  }
+}

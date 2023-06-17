@@ -88,13 +88,100 @@ const widgets = {
           },
           then: {
             properties: {
-              borderColor: {
+              backgroundColor: {
+                title: "Background Color",
                 type: "string",
+                format: "color",
               },
+              borderColor: {
+                title: "Border Color",
+                type: "string",
+                format: "color",
+              },
+              borderType: {
+                title: "Border Type",
+                type: "string",
+                enum: [
+                  "solid",
+                  "dotted",
+                  "dashed",
+                  "double",
+                  "groove",
+                  "ridge",
+                  "inset",
+                  "outset",
+                  "none",
+                  "hidden",
+                ],
+              },
+              borderWidth: {
+                type: "number",
+                title: "Border Width",
+                minimum: 1,
+                maximum: 10,
+                multipleOf: 1,
+                format: "range",
+              },
+              borderRadius: {
+                type: "number",
+                title: "Border Radius",
+                minimum: 0,
+                maximum: 999,
+                multipleOf: 1,
+                format: "range",
+              },
+              blur: {
+                type: "number",
+                title: "Blur",
+                minimum: 0,
+                maximum: 20,
+                multipleOf: 1,
+                format: "range",
+              },
+              secondHand: {
+                $ref: "#/definitions/clockHand",
+                title: "Second Hand",
+              },
+              minuteHand: {
+                $ref: "#/definitions/clockHand",
+                title: "Minute Hand",
+              },
+              hourHand: { $ref: "#/definitions/clockHand", title: "Hour Hand" },
             },
           },
         },
       ],
+      definitions: {
+        clockHand: {
+          type: "object",
+          properties: {
+            enabled: {
+              title: "Enabled",
+              type: "boolean",
+            },
+            color: {
+              title: "Color",
+              type: "string",
+              format: "color",
+            },
+            length: {
+              title: "Length",
+              type: "number",
+              minimum: 0,
+              maximum: 1,
+              multipleOf: 0.01,
+              format: "range",
+            },
+            width: {
+              title: "Width",
+              type: "number",
+              minimum: 1,
+              maximum: 10,
+              format: "range",
+            },
+          },
+        },
+      },
     },
     Component: ClockWidget,
     defaultSize: { w: 2, h: 2 },
