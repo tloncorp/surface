@@ -9,7 +9,7 @@
     flex: 1;
   }
 
-  input:not([type="color"]) {
+  input:not([type='color']) {
     @apply input;
   }
 
@@ -61,7 +61,7 @@
     @apply h-6 w-6;
   }
 
-  .form-group:has(> input[type="color"]) {
+  .form-group:has(> input[type='color']) {
     @apply flex flex-row-reverse items-center justify-center gap-2 self-start;
 
     label {
@@ -69,7 +69,7 @@
     }
   }
 
-  input[type="color"] {
+  input[type='color'] {
     @apply h-6 w-6 overflow-hidden rounded-full;
   }
 
