@@ -1,22 +1,22 @@
-import React, { useEffect, useRef } from "react";
-import useTime from "./useTime";
+import React, { useEffect, useRef } from 'react';
+import useTime from './useTime';
 
 const borderTypes = [
-  "none",
-  "hidden",
-  "dotted",
-  "dashed",
-  "solid",
-  "double",
-  "groove",
-  "ridge",
-  "inset",
-  "outset",
+  'none',
+  'hidden',
+  'dotted',
+  'dashed',
+  'solid',
+  'double',
+  'groove',
+  'ridge',
+  'inset',
+  'outset',
 ] as const;
 
 type BorderType = (typeof borderTypes)[number];
 
-interface ClassicClockConfig {
+export interface ClassicClockConfig {
   backgroundColor: string;
   borderColor: string;
   borderType: BorderType;
@@ -54,7 +54,7 @@ const Clock: React.FC<{
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext('2d');
     if (!context) return;
 
     // Clear the canvas
@@ -112,7 +112,7 @@ const Clock: React.FC<{
       context.lineWidth = config.secondHand.width;
       context.stroke();
     }
-  }, [time, config]);
+  }, [time, config, renderSize]);
 
   return (
     <canvas

@@ -95,7 +95,6 @@ const NotificationContext: React.FC<NotificationContext> = ({
   charge,
   app,
 }) => {
-  console.log(type, groups, rope, charge, app);
   switch (type) {
     case 'channel':
       return (

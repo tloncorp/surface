@@ -4,26 +4,32 @@ import ColorClock from './ColorClock';
 import SeasonClock from './SeasonClock';
 import TextClock from './TextClock';
 
-const ClockWidget = ({
+export interface ClockProps<T extends {} = {}> {
+  size: [number, number];
+  config: T;
+}
+
+const clockComponents = {
+  classic: ClassicClock,
+  color: ColorClock,
+  seasons: SeasonClock,
+  text: TextClock,
+};
+
+type ClockType = keyof typeof clockComponents;
+
+const ClockWidget = <T extends { type: ClockType }>({
   widget,
   layout,
-}: WidgetProps<{
-  type: string;
-}>) => {
+}: WidgetProps<T>) => {
   if (!widget.config.type || !layout) {
     return 'Loading...';
   }
 
-  const Component = {
-    classic: ClassicClock,
-    color: ColorClock,
-    seasons: SeasonClock,
-    text: TextClock,
-  }[widget.config.type];
-
+  const Component = clockComponents[widget.config.type];
   return Component ? (
     <Component
-      size={[widget.layout.w, widget.layout.h] as [number, number]}
+      size={[layout.w, layout.h] as [number, number]}
       config={widget.config}
     />
   ) : (

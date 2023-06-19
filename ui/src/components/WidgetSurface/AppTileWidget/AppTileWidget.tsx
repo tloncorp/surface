@@ -19,8 +19,6 @@ export default function AppTileWidget({
     }
   }, [apps, widget.config.desk]);
 
-  console.log("CHarge", charge)
-
   if (!charge) {
     return <button>Configure</button>;
   }
