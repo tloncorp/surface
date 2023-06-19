@@ -1,13 +1,13 @@
-import { WidgetProps } from "@/widgets";
-import ClassicClock from "./ClassicClock";
-import ColorClock from "./ColorClock";
-import SeasonClock from "./SeasonClock";
-import TextClock from "./TextClock";
+import { WidgetProps } from '@/widgets';
+import ClassicClock from './ClassicClock';
+import ColorClock from './ColorClock';
+import SeasonClock from './SeasonClock';
+import TextClock from './TextClock';
 
 const ClockWidget = ({
   widget,
 }: WidgetProps<{
-  type: "classic";
+  type: 'classic';
 }>) => {
   const Component = {
     classic: ClassicClock,
@@ -16,7 +16,14 @@ const ClockWidget = ({
     text: TextClock,
   }[widget.config.type];
 
-  return <Component size={[widget.layout.w, widget.layout.h]} />;
+  return Component ? (
+    <Component
+      size={[widget.layout.w, widget.layout.h]}
+      config={widget.config}
+    />
+  ) : (
+    'Missing clock type'
+  );
 };
 
 export default ClockWidget;

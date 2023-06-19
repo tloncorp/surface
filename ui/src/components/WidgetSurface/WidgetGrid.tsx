@@ -10,7 +10,7 @@ import WidgetEditor from "./WidgetEditor";
 import { WidgetMenu } from "./WidgetMenu";
 
 const gridSize = 113;
-const gutter = 24;
+const gutterSize = 24;
 
 interface WidgetGridProps {
   id: string;
@@ -35,9 +35,9 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   useLayoutEffect(() => {
     if (!gridRef.current) return;
     const rect = gridRef.current.getBoundingClientRect();
-    const columns = Math.floor(rect.width / (gridSize + gutter));
-    const rows = Math.floor(rect.height / (gridSize + gutter));
-    const width = columns * gridSize + (columns - 1) * gutter;
+    const columns = Math.floor(rect.width / (gridSize + gutterSize));
+    const rows = Math.floor(rect.height / (gridSize + gutterSize));
+    const width = columns * gridSize + (columns - 1) * gutterSize;
     const paddingX = (rect.width - width) / 2;
     const paddingY = 48;
     setConfig({
@@ -123,13 +123,22 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
     <div
       ref={gridRef}
       className="flex h-full w-full overflow-hidden"
-      style={{ padding: `${config?.paddingY}px ${config?.paddingX}px` }}
+      style={{
+        padding: `${config?.paddingY}px ${config?.paddingX}px`,
+      }}
     >
       {config ? (
         <ReactGridLayout
           className="h-full w-full"
+          style={{
+            backgroundPosition: `-${gutterSize / 2}x -${gutterSize / 2}px`,
+            backgroundSize: `${gridSize + gutterSize}px ${
+              gridSize + gutterSize
+            }px`,
+            backgroundImage: `radial-gradient(circle at 50%, #CCC, #CCC 3%, transparent 3.1%)`,
+          }}
           width={config.width}
-          margin={[gutter, gutter]}
+          margin={[gutterSize, gutterSize]}
           containerPadding={[0, 0]}
           cols={config.columns}
           onLayoutChange={handleLayoutChange}
@@ -138,7 +147,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           compactType={null}
           isDroppable={true}
           allowOverlap={false}
-          preventCollision={false}
+          preventCollision={true}
           layout={layouts}
         >
           {children}

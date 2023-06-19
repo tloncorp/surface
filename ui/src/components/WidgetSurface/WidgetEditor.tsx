@@ -25,10 +25,10 @@ const WidgetEditor = ({
     });
   }, []);
 
-  const handleSubmit = useCallback((e: IChangeEvent) => {
+  const handleSubmit = useCallback(() => {
     onSubmit?.({
       ...widget,
-      config: e.formData,
+      config: formRef.current?.state.formData,
     });
   }, []);
 
@@ -59,7 +59,7 @@ const WidgetEditor = ({
             <button className="secondary-button" onClick={onCancel}>
               Cancel
             </button>
-            <button className="button" type="submit">
+            <button className="button" type="submit" onClick={handleSubmit}>
               Done
             </button>
           </div>

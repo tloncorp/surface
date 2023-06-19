@@ -1,14 +1,14 @@
-import { Layout } from "react-grid-layout";
-import ClockWidget from "./components/WidgetSurface/ClockWidget/ClockWidget";
-import { ClockIcon } from "./components/icons/ClockIcon";
-import { IconProps } from "./components/icons/icon";
-import { AppShortcutIcon } from "./components/icons/AppShortcutIcon";
-import { PinRefIcon } from "./components/icons/PinRefIcon";
-import { LatestPostIcon } from "./components/icons/LatestPostIcon";
-import { MiniNotificationIcon } from "./components/icons/MiniNotificationIcon";
-import AppTileWidget from "./components/WidgetSurface/AppTileWidget/AppTileWidget";
-import NoteWidget from "./components/WidgetSurface/NoteWidget/NoteWidget";
-import ActivityWidget from "./components/WidgetSurface/ActivityWidget/ActivityWidget";
+import { Layout } from 'react-grid-layout';
+import ActivityWidget from './components/WidgetSurface/ActivityWidget/ActivityWidget';
+import AppTileWidget from './components/WidgetSurface/AppTileWidget/AppTileWidget';
+import ClockWidget from './components/WidgetSurface/ClockWidget/ClockWidget';
+import NoteWidget from './components/WidgetSurface/NoteWidget/NoteWidget';
+import { AppShortcutIcon } from './components/icons/AppShortcutIcon';
+import { ClockIcon } from './components/icons/ClockIcon';
+import { LatestPostIcon } from './components/icons/LatestPostIcon';
+import { MiniNotificationIcon } from './components/icons/MiniNotificationIcon';
+import { PinRefIcon } from './components/icons/PinRefIcon';
+import { IconProps } from './components/icons/icon';
 
 export interface WidgetProps<Config = any> {
   widget: Widget<Config>;
@@ -27,11 +27,12 @@ export interface WidgetDef<Config = any> {
   params: {};
   /** Component used to render this def */
   Component: React.ComponentType<WidgetProps<Config>>;
+  defaultParams?: Config | (() => Config);
   defaultSize: { w: number; h: number };
 }
 
 export interface Widgets {
-  type: "widgets";
+  type: 'widgets';
   widgets: Widget[];
 }
 
@@ -46,33 +47,47 @@ export interface Widget<Config = any> {
   config: Config;
 }
 
+const borderTypes = [
+  'solid',
+  'dotted',
+  'dashed',
+  'double',
+  'groove',
+  'ridge',
+  'inset',
+  'outset',
+  'none',
+  'hidden',
+];
+
 const widgets = {
   clock: {
-    id: "clock",
-    name: "Clock",
-    description: "Select from a gaggle of faces",
+    id: 'clock',
+    name: 'Clock',
+    description: 'Select from a gaggle of faces',
     icon: ClockIcon,
+    Component: ClockWidget,
     params: {
       properties: {
         type: {
-          type: "string",
-          title: "Clock Type",
+          type: 'string',
+          title: 'Clock Type',
           oneOf: [
             {
-              const: "classic",
-              title: "Classic",
+              const: 'classic',
+              title: 'Classic',
             },
             {
-              const: "seasons",
-              title: "Seasons",
+              const: 'seasons',
+              title: 'Seasons',
             },
             {
-              const: "color",
-              title: "Color",
+              const: 'color',
+              title: 'Color',
             },
             {
-              const: "text",
-              title: "Text",
+              const: 'text',
+              title: 'Text',
             },
           ],
         },
@@ -82,141 +97,168 @@ const widgets = {
           if: {
             properties: {
               type: {
-                const: "classic",
+                const: 'classic',
               },
             },
           },
           then: {
             properties: {
               backgroundColor: {
-                title: "Background Color",
-                type: "string",
-                format: "color",
+                title: 'Background Color',
+                type: 'string',
+                format: 'color',
               },
               borderColor: {
-                title: "Border Color",
-                type: "string",
-                format: "color",
+                title: 'Border Color',
+                type: 'string',
+                format: 'color',
               },
               borderType: {
-                title: "Border Type",
-                type: "string",
-                enum: [
-                  "solid",
-                  "dotted",
-                  "dashed",
-                  "double",
-                  "groove",
-                  "ridge",
-                  "inset",
-                  "outset",
-                  "none",
-                  "hidden",
-                ],
+                title: 'Border Type',
+                type: 'string',
+                enum: borderTypes,
               },
               borderWidth: {
-                type: "number",
-                title: "Border Width",
+                type: 'number',
+                title: 'Border Width',
                 minimum: 1,
-                maximum: 10,
-                multipleOf: 1,
-                format: "range",
-              },
-              borderRadius: {
-                type: "number",
-                title: "Border Radius",
-                minimum: 0,
-                maximum: 999,
-                multipleOf: 1,
-                format: "range",
-              },
-              blur: {
-                type: "number",
-                title: "Blur",
-                minimum: 0,
                 maximum: 20,
                 multipleOf: 1,
-                format: "range",
+                format: 'range',
+              },
+              borderRadius: {
+                type: 'number',
+                title: 'Border Radius',
+                minimum: 0,
+                maximum: 200,
+                multipleOf: 1,
+                format: 'range',
+              },
+              blur: {
+                type: 'number',
+                title: 'Blur',
+                minimum: 0,
+                maximum: 15,
+                multipleOf: 1,
+                format: 'range',
               },
               secondHand: {
-                $ref: "#/definitions/clockHand",
-                title: "Second Hand",
+                $ref: '#/definitions/clockHand',
+                title: 'Second Hand',
               },
               minuteHand: {
-                $ref: "#/definitions/clockHand",
-                title: "Minute Hand",
+                $ref: '#/definitions/clockHand',
+                title: 'Minute Hand',
               },
-              hourHand: { $ref: "#/definitions/clockHand", title: "Hour Hand" },
+              hourHand: { $ref: '#/definitions/clockHand', title: 'Hour Hand' },
             },
           },
         },
       ],
       definitions: {
         clockHand: {
-          type: "object",
+          type: 'object',
           properties: {
             enabled: {
-              title: "Enabled",
-              type: "boolean",
+              title: 'Enabled',
+              type: 'boolean',
             },
             color: {
-              title: "Color",
-              type: "string",
-              format: "color",
+              title: 'Color',
+              type: 'string',
+              format: 'color',
             },
             length: {
-              title: "Length",
-              type: "number",
+              title: 'Length',
+              type: 'number',
               minimum: 0,
               maximum: 1,
               multipleOf: 0.01,
-              format: "range",
+              format: 'range',
             },
             width: {
-              title: "Width",
-              type: "number",
+              title: 'Width',
+              type: 'number',
               minimum: 1,
-              maximum: 10,
-              format: "range",
+              maximum: 40,
+              format: 'range',
             },
           },
         },
       },
     },
-    Component: ClockWidget,
+    defaultParams: () => {
+      const lengths = [
+        random.number(0.1, 1.0),
+        random.number(0.1, 1.0),
+        random.number(0.1, 1.0),
+      ].sort((a, b) => a - b);
+      const widths = [
+        random.int(1, 10),
+        random.int(1, 10),
+        random.int(1, 10),
+      ].sort((a, b) => a - b);
+      return {
+        type: 'classic',
+        backgroundColor: random.color(),
+        borderColor: random.color(),
+        borderType: borderTypes[random.int(0, borderTypes.length - 1)],
+        borderWidth: random.int(0, 20),
+        borderRadius: random.int(0, 200),
+        blur: random.boolean() ? 0 : random.int(0, 20),
+        hourHand: {
+          enabled: true,
+          width: widths[2],
+          length: lengths[0],
+          color: random.color(),
+        },
+        minuteHand: {
+          enabled: true,
+          width: widths[1],
+          length: lengths[1],
+          color: random.color(),
+        },
+        secondHand: {
+          enabled: true,
+          width: widths[0],
+          length: lengths[2],
+          color: random.color(),
+        },
+      };
+    },
     defaultSize: { w: 2, h: 2 },
   },
   shortcut: {
-    id: "shortcut",
-    name: "Shortcut",
-    description: "Pin an app to your Landscape",
+    id: 'shortcut',
+    name: 'Shortcut',
+    description: 'Pin an app to your Landscape',
     icon: AppShortcutIcon,
     params: {},
     Component: AppTileWidget,
     defaultSize: { w: 2, h: 2 },
   },
   reference: {
-    id: "reference",
-    name: "Reference",
-    description: "Pin a reference to your Landscape",
+    id: 'reference',
+    name: 'Reference',
+    description: 'Pin a reference to your Landscape',
     icon: PinRefIcon,
     params: {},
     Component: ClockWidget,
     defaultSize: { w: 3, h: 2 },
   },
-  "latest-post": {
-    id: "latest-post",
-    name: "Latest Post",
-    description: "Pin the latest post from a Gallery/Notebook",
+  'latest-post': {
+    id: 'latest-post',
+    name: 'Latest Post',
+    description: 'Pin the latest post from a Gallery/Notebook',
     icon: LatestPostIcon,
     params: {},
     Component: NoteWidget,
     defaultSize: { w: 4, h: 5 },
   },
-  "mini-notifications": {
-    id: "mini-notifications",
-    name: "Mini Notifications",
-    description: "Surface latest notification received",
+  'mini-notifications': {
+    id: 'mini-notifications',
+    name: 'Mini Notifications',
+    description: 'Surface latest notification received',
     icon: MiniNotificationIcon,
     params: {},
     Component: ActivityWidget,
@@ -227,3 +269,23 @@ const widgets = {
 const typedWidgets = widgets as { [key in WidgetType]: WidgetDef };
 
 export { typedWidgets as widgets };
+
+const random = {
+  int: (min: number, max: number) => {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  },
+  number: (min: number, max: number) => {
+    return Math.random() * (max - min) + min;
+  },
+  color: () => {
+    const [h, s, l] = [
+      random.int(0, 360),
+      random.int(0, 100),
+      random.int(0, 100),
+    ];
+    return `hsl(${h}, ${s}%, ${l}%)`;
+  },
+  boolean: () => {
+    return Math.random() > 0.5;
+  },
+};

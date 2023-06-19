@@ -136,6 +136,9 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
   },
   addWidget: (id, pane, widget) => {
     const wId = `${widget.id}-${Date.now()}`;
+    const config = widget.defaultParams instanceof Function 
+     ? widget.defaultParams()
+     : widget.defaultParams ?? {};
     const newWidget: Widget = {
       id: wId,
       type: widget.id,
@@ -145,9 +148,7 @@ export const useSurfaceState = create<SurfaceState>()(subscribeWithSelector(pers
         y: 0,
         ...widget.defaultSize,
       },
-      config: {
-        type: "classic",
-      }
+      config,
     };
     get().updatePane(id, {
       ...pane,
