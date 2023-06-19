@@ -14,21 +14,30 @@ const sizeMap: Record<DocketImageSizes, string> = {
   xs: 'w-6 h-6 rounded',
   small: 'w-8 h-8 rounded-md',
   default: 'w-12 h-12 rounded-lg',
-  full: 'w-20 h-20 md:w-32 md:h-32 rounded-2xl'
+  full: 'w-20 h-20 md:w-32 md:h-32 rounded-2xl',
 };
 
-export function DocketImage({ color, image, className = '', size = 'full' }: DocketImageProps) {
-  const { tileColor } = useTileColor(color);
+export function DocketImage({
+  color,
+  image,
+  className = '',
+  size = 'full',
+}: DocketImageProps) {
+  const { tileColor } = useTileColor(color ?? 'black');
   const [imageError, setImageError] = useState(false);
 
   return (
     <div
-      className={cn('flex-none relative bg-gray-200 overflow-hidden', sizeMap[size], className)}
+      className={cn(
+        'relative flex-none overflow-hidden bg-gray-200',
+        sizeMap[size],
+        className
+      )}
       style={{ backgroundColor: tileColor }}
     >
       {image && !imageError && (
         <img
-          className="absolute top-0 left-0 h-full w-full object-cover"
+          className="absolute left-0 top-0 h-full w-full object-cover"
           src={image}
           alt=""
           onError={() => setImageError(true)}

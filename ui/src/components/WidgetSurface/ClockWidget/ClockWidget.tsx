@@ -6,9 +6,14 @@ import TextClock from './TextClock';
 
 const ClockWidget = ({
   widget,
+  layout,
 }: WidgetProps<{
-  type: 'classic';
+  type: string;
 }>) => {
+  if (!widget.config.type || !layout) {
+    return 'Loading...';
+  }
+
   const Component = {
     classic: ClassicClock,
     color: ColorClock,
@@ -18,7 +23,7 @@ const ClockWidget = ({
 
   return Component ? (
     <Component
-      size={[widget.layout.w, widget.layout.h]}
+      size={[widget.layout.w, widget.layout.h] as [number, number]}
       config={widget.config}
     />
   ) : (

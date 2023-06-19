@@ -12,6 +12,10 @@ import { IconProps } from './components/icons/icon';
 
 export interface WidgetProps<Config = any> {
   widget: Widget<Config>;
+  handleWidgetEdited?: (widget: Widget) => void;
+  editingWidget?: boolean;
+  setEditingWidget?: (editing: boolean) => void;
+  layout?: Layout;
 }
 
 export interface WidgetDef<Config = any> {
@@ -233,7 +237,16 @@ const widgets = {
     name: 'Shortcut',
     description: 'Pin an app to your Landscape',
     icon: AppShortcutIcon,
-    params: {},
+    params: {
+      type: 'object',
+      properties: {
+        desk: {
+          type: 'string',
+          title: 'App',
+          format: 'charge',
+        },
+      },
+    },
     Component: AppTileWidget,
     defaultSize: { w: 2, h: 2 },
   },
@@ -251,7 +264,16 @@ const widgets = {
     name: 'Latest Post',
     description: 'Pin the latest post from a Gallery/Notebook',
     icon: LatestPostIcon,
-    params: {},
+    params: {
+      type: 'object',
+      properties: {
+        chFlag: {
+          type: 'string',
+          title: 'Channel',
+          format: 'channel',
+        },
+      },
+    },
     Component: NoteWidget,
     defaultSize: { w: 4, h: 5 },
   },

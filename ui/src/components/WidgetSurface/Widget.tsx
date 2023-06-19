@@ -1,6 +1,6 @@
-import { WidgetProps, Widget as WidgetConfig } from "@/widgets";
-import React, { HTMLProps, PropsWithChildren, useCallback } from "react";
-import { widgets } from "@/widgets";
+import { WidgetProps, Widget as WidgetConfig } from '@/widgets';
+import React, { HTMLProps, PropsWithChildren, useCallback } from 'react';
+import { widgets } from '@/widgets';
 
 const Widget = React.forwardRef<
   HTMLDivElement,
@@ -23,8 +23,8 @@ const Widget = React.forwardRef<
   const { width, height } = forwardProps.style ?? { width: 0, height: 0 };
   const layout = {
     ...widget.layout,
-    w: typeof width === "string" ? parseInt(width) : width ?? 0,
-    h: typeof height === "string" ? parseInt(height) : height ?? 0,
+    w: typeof width === 'string' ? parseInt(width) : width ?? 0,
+    h: typeof height === 'string' ? parseInt(height) : height ?? 0,
   };
 
   const handlePressEdit = useCallback(() => {
@@ -46,15 +46,15 @@ const Widget = React.forwardRef<
       style={{ ...forwardProps.style }}
     >
       {def ? (
-        <def.Component widget={{ ...widget, layout }} />
+        <def.Component widget={widget} layout={layout} />
       ) : (
-        "No renderer found for widget type" + widget.type
+        'No renderer found for widget type' + widget.type
       )}
       {editMode && (
         <>
           <a
             className="absolute -bottom-2 -left-2 -right-2 -top-2 z-10 flex items-center justify-center rounded-2xl"
-            style={{ backgroundColor: "rgba(0,0,0,0.1)" }}
+            style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
             onClick={handlePressEdit}
           >
             <span className="secondary-button">Edit</span>

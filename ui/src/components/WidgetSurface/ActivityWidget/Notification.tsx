@@ -48,7 +48,7 @@ function makePrettyTime(date: Date) {
 function getNotificationType(rope: Rope): NotificationType {
   if (
     ['/channel/edit', '/channel/add', '/channel/del', '/joins', '/leaves'].some(
-      thread => rope.thread.endsWith(thread)
+      (thread) => rope.thread.endsWith(thread)
     )
   ) {
     return 'group-meta';
@@ -69,7 +69,7 @@ const NotificationTrigger: React.FC<NotificationTrigger> = ({
   type,
   groups,
   rope,
-  ship
+  ship,
 }) => {
   switch (type) {
     case 'group-meta':
@@ -93,8 +93,9 @@ const NotificationContext: React.FC<NotificationContext> = ({
   groups,
   rope,
   charge,
-  app
+  app,
 }) => {
+  console.log(type, groups, rope, charge, app);
   switch (type) {
     case 'channel':
       return (
@@ -139,7 +140,7 @@ const NotificationContext: React.FC<NotificationContext> = ({
 
 const NotificationContent: React.FC<NotificationContent> = ({
   type,
-  content
+  content,
 }) => {
   const con = content;
   const mentionRe = new RegExp('mentioned');

@@ -3,22 +3,22 @@ import { WidgetProps } from '@/widgets';
 import NoteReference from './NoteReference';
 
 export default function NoteWidget({
-  widget
+  widget,
+  editingWidget,
+  setEditingWidget,
 }: WidgetProps<{ chFlag: string }>) {
-  const dummyFlag = '~nibset-napwyn/winter-updates';
-
-  const { letters } = useNotes(widget.config.chFlag || dummyFlag);
+  const { letters } = useNotes(widget.config.chFlag ?? '');
   const latestNote = letters.peekLargest();
 
   if (!latestNote) {
-    return null;
+    return 'Loading...';
   }
 
   return (
     <NoteReference
-      chFlag={widget.config.chFlag || dummyFlag}
+      chFlag={widget.config.chFlag}
       outline={latestNote[1]}
-      nest={`diary/${widget.config.chFlag || dummyFlag}`}
+      nest={`diary/${widget.config.chFlag}`}
       id={latestNote[0].toString()}
     />
   );

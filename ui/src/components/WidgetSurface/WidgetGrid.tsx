@@ -1,13 +1,13 @@
-import { useSurfaceState } from "@/state/surface";
-import { WidgetPane } from "@/types/surface";
-import { Widget as WidgetConfig } from "@/widgets";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import ReactGridLayout, { Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import Widget from "./Widget";
-import WidgetEditor from "./WidgetEditor";
-import { WidgetMenu } from "./WidgetMenu";
+import { useSurfaceState } from '@/state/surface';
+import { WidgetPane } from '@/types/surface';
+import { Widget as WidgetConfig } from '@/widgets';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import ReactGridLayout, { Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import Widget from './Widget';
+import WidgetEditor from './WidgetEditor';
+import { WidgetMenu } from './WidgetMenu';
 
 const gridSize = 113;
 const gutterSize = 24;
@@ -44,7 +44,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       columns,
       rows,
       width,
-
       paddingX,
       paddingY,
     });
@@ -108,7 +107,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       }),
       layouts: widgets.map((item) => item.layout),
     };
-  }, [widgets, isEditing, handlePressEditWidget]);
+  }, [widgets, isEditing]);
 
   const handleClickEdit = useCallback(() => {
     setIsEditing(true);
