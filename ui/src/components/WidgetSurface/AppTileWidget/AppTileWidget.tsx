@@ -1,26 +1,84 @@
 import { ChargeWithDesk, useInstalledApps } from '@/state/docket';
 import { WidgetProps } from '@/widgets';
+import WidgetEditor from '@/components/WidgetSurface/WidgetEditor';
+import { getQueryParam } from '@/logic/utils';
 import { Tile } from './Tile';
+import {
+  useEditWidget,
+  usePaneFromWidget,
+  useSurface,
+} from '@/state/surface';
+import { useEffect, useMemo, useState } from 'react';
+import { RJSFSchema } from '@rjsf/utils';
 
 export default function AppTileWidget({
-  widget
-}: WidgetProps<{ charge: ChargeWithDesk; desk: string }>) {
+  widget,
+  editingWidget,
+  setEditingWidget
+}: WidgetProps<{ desk: string }>) {
+  const [charge, setCharge] = useState<ChargeWithDesk | null>(null);
   const apps = useInstalledApps();
+  const surfaceId = getQueryParam('surface') ?? 'default';
+  const surface = useSurface(surfaceId);
+  const pane = usePaneFromWidget(surfaceId, widget.id);
+  const handleEditWidget = useEditWidget(
+    surfaceId,
+    widget.id,
+    setEditingWidget
+  );
 
-  if (!apps) {
-    return null;
+  useEffect(() => {
+    if (!widget.config.desk && setEditingWidget) {
+      setEditingWidget(true);
+    }
+  }, [widget.config.desk]);
+
+  useEffect(() => {
+    if (apps && widget.config.desk) {
+      const charge = apps.find(c => c.desk === widget.config.desk);
+      if (!charge) {
+        return;
+      }
+      setCharge(charge);
+    }
+  }, [apps, widget.config.desk]);
+
+  const params: RJSFSchema = useMemo(() => {
+    return {
+      properties: {
+        desk: {
+          type: 'string',
+          title: 'App',
+          oneOf: apps.map(app => ({
+            const: app.desk,
+            title: app.title
+          }))
+        }
+      }
+    };
+  }, [apps]);
+
+  if (!pane || !surface) {
+    return "Loading...";
   }
 
-  const charge = apps[0];
+  if (editingWidget) {
+    return (
+      <WidgetEditor
+        widget={widget}
+        onSubmit={handleEditWidget}
+        showPreview={false}
+        onCancel={
+          setEditingWidget && charge ? () => setEditingWidget(false) : undefined
+        }
+        params={params}
+      />
+    );
+  }
 
   if (!charge) {
-    return null;
+    return "Loading...";
   }
 
-  return (
-    <Tile
-      charge={widget.config.charge ?? charge}
-      desk={widget.config.desk ?? charge.desk}
-    />
-  );
+  return <Tile charge={charge} desk={widget.config.desk} />;
 }

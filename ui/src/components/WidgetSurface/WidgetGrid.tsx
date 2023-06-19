@@ -1,13 +1,12 @@
-import { useSurfaceState } from "@/state/surface";
-import { WidgetPane } from "@/types/surface";
-import { Widget as WidgetConfig } from "@/widgets";
-import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
-import ReactGridLayout, { Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
-import Widget from "./Widget";
-import WidgetEditor from "./WidgetEditor";
-import { WidgetMenu } from "./WidgetMenu";
+import { useSurfaceState } from '@/state/surface';
+import { WidgetPane } from '@/types/surface';
+import { Widget as WidgetConfig } from '@/widgets';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import ReactGridLayout, { Layout } from 'react-grid-layout';
+import 'react-grid-layout/css/styles.css';
+import 'react-resizable/css/styles.css';
+import Widget from './Widget';
+import { WidgetMenu } from './WidgetMenu';
 
 const gridSize = 113;
 const gutter = 24;
@@ -19,7 +18,6 @@ interface WidgetGridProps {
 
 const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editingWidget, setEditingWidget] = useState<WidgetConfig | null>(null);
   const { widgets } = pane;
   const { updatePane } = useSurfaceState();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -46,7 +44,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       width,
 
       paddingX,
-      paddingY,
+      paddingY
     });
   }, []);
 
@@ -57,37 +55,19 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
         widgets: widgets.map((item, i) => {
           return {
             ...item,
-            layout: { ...newLayouts[i] },
+            layout: { ...newLayouts[i] }
           };
-        }),
+        })
       });
     },
     [id, pane, widgets]
-  );
-
-  const handlePressEditWidget = useCallback((widget: WidgetConfig) => {
-    setEditingWidget(widget);
-  }, []);
-
-  const handleWidgetEdited = useCallback(
-    (updatedWidget: WidgetConfig) => {
-      const newWidgets = widgets.map((item) => {
-        return item.id === updatedWidget?.id ? updatedWidget : item;
-      });
-      setEditingWidget(null);
-      updatePane(id, {
-        ...pane,
-        widgets: newWidgets,
-      });
-    },
-    [widgets]
   );
 
   const handlePressRemoveWidget = useCallback(
     (widget: WidgetConfig) => {
       updatePane(id, {
         ...pane,
-        widgets: widgets.filter((item) => item.id !== widget.id),
+        widgets: widgets.filter(item => item.id !== widget.id)
       });
     },
     [widgets]
@@ -102,13 +82,12 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
             key={item.id}
             editMode={isEditing}
             onPressRemove={handlePressRemoveWidget}
-            onPressEdit={handlePressEditWidget}
           />
         );
       }),
-      layouts: widgets.map((item) => item.layout),
+      layouts: widgets.map(item => item.layout)
     };
-  }, [widgets, isEditing, handlePressEditWidget]);
+  }, [widgets, isEditing]);
 
   const handleClickEdit = useCallback(() => {
     setIsEditing(true);
@@ -116,7 +95,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
 
   const handleClickDoneEditing = useCallback(() => {
     setIsEditing(false);
-    setEditingWidget(null);
   }, []);
 
   return (
@@ -166,9 +144,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           )}
         </div>
       </footer>
-      {editingWidget && (
-        <WidgetEditor widget={editingWidget} onSubmit={handleWidgetEdited} />
-      )}
     </div>
   );
 };
