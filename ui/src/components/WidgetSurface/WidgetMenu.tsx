@@ -23,7 +23,7 @@ export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger asChild>
-        <button className="nav-button default-focus">Add Widget</button>
+        <button className="nav-button default-focus bg-black bg-opacity-10 backdrop-blur">Add Widget</button>
       </Dropdown.Trigger>
       <Dropdown.Content
         align="start"

@@ -7,6 +7,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import Widget from './Widget';
 import WidgetEditor from './WidgetEditor';
+import { WidgetMenu } from './WidgetMenu';
 
 const gridSize = 80;
 const gutterSize = 16;
@@ -171,6 +172,11 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           </ReactGridLayout>
         ) : null}
       </div>
+      <footer className="fixed bottom-4 left-0 flex w-full justify-center p-2">
+        <div className="flex items-center justify-center space-x-2">
+          <WidgetMenu id={id} pane={pane} />
+        </div>
+      </footer>
       {editorTarget && (
         <WidgetEditor
           widget={editorTarget}
