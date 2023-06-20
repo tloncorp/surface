@@ -12,9 +12,7 @@ import { IconProps } from './components/icons/icon';
 
 export interface WidgetProps<Config = any> {
   widget: Widget<Config>;
-  handleWidgetEdited?: (widget: Widget) => void;
-  editingWidget?: boolean;
-  setEditingWidget?: (editing: boolean) => void;
+  onPressEdit?: (widget: Widget) => void;
   layout?: Layout;
 }
 

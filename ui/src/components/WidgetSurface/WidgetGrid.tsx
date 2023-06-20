@@ -7,7 +7,6 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import Widget from './Widget';
 import WidgetEditor from './WidgetEditor';
-import { WidgetMenu } from './WidgetMenu';
 
 const gridSize = 80;
 const gutterSize = 16;
@@ -18,7 +17,6 @@ interface WidgetGridProps {
 }
 
 const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
-  const [isEditing, setIsEditing] = useState(false);
   const [editorTarget, setEditorTarget] = useState<WidgetConfig | null>(null);
   const [dragTarget, setDragTarget] = useState<WidgetConfig | null>(null);
   const { widgets } = pane;
@@ -100,7 +98,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           <Widget
             widget={item}
             key={item.id}
-            editMode={isEditing}
             dragMode={item.id === dragTarget?.id}
             onPressRemove={handlePressRemoveWidget}
             onPressEdit={handlePressEditWidget}
@@ -109,16 +106,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       }),
       layouts: widgets.map((item) => item.layout),
     };
-  }, [widgets, isEditing, dragTarget]);
-
-  const handleClickEdit = useCallback(() => {
-    setIsEditing(true);
-  }, []);
-
-  const handleClickDoneEditing = useCallback(() => {
-    setIsEditing(false);
-    setEditorTarget(null);
-  }, []);
+  }, [widgets, dragTarget]);
 
   const handleCancelEditingWidget = useCallback(() => {
     setEditorTarget(null);
@@ -183,28 +171,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           </ReactGridLayout>
         ) : null}
       </div>
-      <footer className="fixed bottom-4 left-0 flex w-full justify-center p-2">
-        <div className="flex items-center justify-center space-x-2">
-          {isEditing ? (
-            <button
-              className="nav-button default-focus"
-              onClick={handleClickDoneEditing}
-            >
-              Done
-            </button>
-          ) : (
-            <>
-              <button
-                className="nav-button default-focus"
-                onClick={handleClickEdit}
-              >
-                Edit
-              </button>
-              <WidgetMenu id={id} pane={pane} />
-            </>
-          )}
-        </div>
-      </footer>
       {editorTarget && (
         <WidgetEditor
           widget={editorTarget}

@@ -44,7 +44,7 @@ const WidgetEditor = ({
   }, []);
 
   return (
-    <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center rounded-2xl">
+    <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center rounded-2xl bg-black bg-opacity-10">
       <div
         className="flex flex-row rounded-xl bg-white"
         style={{ width: 700, minHeight: 400, maxHeight: '80vh' }}

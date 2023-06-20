@@ -1,5 +1,8 @@
 import { Widget as WidgetConfig, WidgetProps, widgets } from '@/widgets';
 import React, { HTMLProps, PropsWithChildren, useCallback } from 'react';
+import XIcon from '../icons/XIcon';
+import MenuIcon from '../icons/MenuIcon';
+import cn from 'classnames'
 
 const Widget = React.forwardRef<
   HTMLDivElement,
@@ -49,29 +52,31 @@ const Widget = React.forwardRef<
           // This prevents click events from firing after the widget is dragged
           ...(dragMode ? { pointerEvents: 'none' } : {}),
         }}
+        className={cn(forwardProps.className, 'group')}
       >
         {def ? (
-          <def.Component widget={widget} layout={layout} />
+          <def.Component
+            widget={widget}
+            layout={layout}
+            onPressEdit={onPressEdit}
+          />
         ) : (
           `No renderer found for widget type: '${widget.type}'.`
         )}
-        {editMode && (
-          <>
-            <a
-              className="absolute -bottom-2 -left-2 -right-2 -top-2 z-10 flex items-center justify-center rounded-2xl"
-              style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-              onClick={handlePressEdit}
-            >
-              <span className="secondary-button">Edit</span>
-            </a>
-            <button
-              onClick={handlePressRemove}
-              className="absolute right-0 top-0 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-xl uppercase"
-            >
-              &times;
-            </button>
-          </>
-        )}
+        <div className="absolute right-4 top-4 flex flex-row gap-1 hidden group-hover:flex">
+          <button
+            className="flex h-6 w-6 items-center justify-center rounded bg-black bg-opacity-10 text-white backdrop-blur"
+            onClick={handlePressEdit}
+          >
+            <MenuIcon className="h-4 w-4" />
+          </button>
+          <button
+            className="flex h-6 w-6 items-center justify-center rounded bg-black bg-opacity-10 text-white backdrop-blur"
+            onClick={handlePressRemove}
+          >
+            <XIcon className="h-4 w-4" />
+          </button>
+        </div>
       </div>
     );
   }
