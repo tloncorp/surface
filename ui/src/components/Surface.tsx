@@ -14,11 +14,7 @@ interface SurfacePaneProps {
 /**
  * Responsible for rendering an app in an iframe.
  */
-const SurfacePane = ({
-  id,
-  pane,
-  isActive,
-}: SurfacePaneProps) => {
+const SurfacePane = ({ id, pane, isActive }: SurfacePaneProps) => {
   const [shouldRender, setShouldRender] = React.useState(isActive);
   const { isDragging: dragInteractionInProgress } =
     useContext(InteractionContext);
@@ -42,21 +38,22 @@ const SurfacePane = ({
     <div
       style={{
         // by default, iframes will eat pointer events, which can cause issues during drag
-        pointerEvents: dragInteractionInProgress ? "none" : undefined,
+        pointerEvents: dragInteractionInProgress ? 'none' : undefined,
       }}
-      className={cn("flex flex-col overflow-hidden rounded-lg", {
-        "absolute left-0 top-0 w-0 h-0": !isActive,
-        "relative h-full w-full": isActive,
+      className={cn('flex flex-col rounded-lg', {
+        'absolute left-0 top-0 h-0 w-0': !isActive,
+        'relative h-full w-full': isActive,
       })}
     >
-      {pane.type === "app" ? (
+      {pane.type === 'app' ? (
         <iframe
           className="min-h-0 flex-1 overflow-hidden rounded-lg border-0 bg-white shadow-md"
           src={pane.path}
         />
-      )
-      : (
-        <WidgetGrid id={id} pane={pane}/>
+      ) : (
+        <div className="h-full rounded-lg border-2 border-gray-200 border-opacity-50">
+          <WidgetGrid id={id} pane={pane} />
+        </div>
       )}
     </div>
   ) : null;
@@ -71,7 +68,12 @@ const Surface = ({ surface }: SurfaceProps) => {
   const isActive = surface.id === activeSurface;
 
   return (
-    <div className={cn("absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0", isActive ? 'z-30' : 'z-20' )}>
+    <div
+      className={cn(
+        'absolute left-0 top-0 flex h-full w-full gap-2 p-2 pt-0',
+        isActive ? 'z-30' : 'z-20'
+      )}
+    >
       {surface.panes.map((pane, index) => (
         <SurfacePane
           id={surface.id}
@@ -81,7 +83,7 @@ const Surface = ({ surface }: SurfaceProps) => {
         />
       ))}
     </div>
-  )
-}
+  );
+};
 
 export default Surface;

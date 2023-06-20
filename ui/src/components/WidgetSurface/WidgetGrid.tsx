@@ -2,15 +2,19 @@ import { useSurfaceState } from '@/state/surface';
 import { WidgetPane } from '@/types/surface';
 import { Widget as WidgetConfig } from '@/widgets';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import ReactGridLayout, { Layout } from 'react-grid-layout';
+import ReactGridLayout, {
+  ItemCallback,
+  Layout,
+  ReactGridLayoutProps,
+} from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import Widget from './Widget';
 import WidgetEditor from './WidgetEditor';
 import { WidgetMenu } from './WidgetMenu';
 
-const gridSize = 113;
-const gutterSize = 24;
+const gridSize = 80;
+const gutterSize = 16;
 
 interface WidgetGridProps {
   id: string;
@@ -19,7 +23,8 @@ interface WidgetGridProps {
 
 const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editingWidget, setEditingWidget] = useState<WidgetConfig | null>(null);
+  const [editorTarget, setEditorTarget] = useState<WidgetConfig | null>(null);
+  const [dragTarget, setDragTarget] = useState<WidgetConfig | null>(null);
   const { widgets } = pane;
   const { updatePane } = useSurfaceState();
   const gridRef = useRef<HTMLDivElement>(null);
@@ -65,7 +70,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
   );
 
   const handlePressEditWidget = useCallback((widget: WidgetConfig) => {
-    setEditingWidget(widget);
+    setEditorTarget(widget);
   }, []);
 
   const handleWidgetEdited = useCallback(
@@ -73,7 +78,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       const newWidgets = widgets.map((item) => {
         return item.id === updatedWidget?.id ? updatedWidget : item;
       });
-      setEditingWidget(null);
+      setEditorTarget(null);
       updatePane(id, {
         ...pane,
         widgets: newWidgets,
@@ -100,6 +105,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
             widget={item}
             key={item.id}
             editMode={isEditing}
+            dragMode={item.id === dragTarget?.id}
             onPressRemove={handlePressRemoveWidget}
             onPressEdit={handlePressEditWidget}
           />
@@ -107,7 +113,7 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
       }),
       layouts: widgets.map((item) => item.layout),
     };
-  }, [widgets, isEditing]);
+  }, [widgets, isEditing, dragTarget]);
 
   const handleClickEdit = useCallback(() => {
     setIsEditing(true);
@@ -115,44 +121,80 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
 
   const handleClickDoneEditing = useCallback(() => {
     setIsEditing(false);
-    setEditingWidget(null);
+    setEditorTarget(null);
   }, []);
 
+  const handleCancelEditingWidget = useCallback(() => {
+    setEditorTarget(null);
+  }, []);
+
+  // React grid layout doesn't always fire `onDragStop` after `onDragStart`,
+  // so we need to manually bind listeners to track the drag state.
+  // See https://github.com/react-grid-layout/react-grid-layout/issues/1341
+  const handleDragStart: ItemCallback = useCallback(
+    (layouts, targetLayout, oldLayout, newLayout, e) => {
+      const origin = { x: e.pageX, y: e.pageY };
+      let dragStarted = false;
+
+      const handleMouseMove = (e: MouseEvent) => {
+        if (!dragStarted) {
+          const distance = Math.sqrt(
+            Math.pow(e.pageX - origin.x, 2) + Math.pow(e.pageY - origin.y, 2)
+          );
+          if (distance > 0) {
+            dragStarted = true;
+            const draggedWidget = widgets.find((w) => w.id === targetLayout.i);
+            setDragTarget(draggedWidget ?? null);
+          }
+        }
+      };
+      const handleMouseUp = () => {
+        setDragTarget(null);
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('mouseup', handleMouseUp);
+      };
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    },
+    [widgets]
+  );
+
+  console.log('old', {
+    backgroundPosition: `-${gutterSize / 2}px -${gutterSize / 2}px`,
+    backgroundSize: `${gridSize + gutterSize}px ${gridSize + gutterSize}px`,
+    backgroundImage: `radial-gradient(circle at 50%, #F00, #F00, 3%, transparent 3.1%)`,
+  });
+
   return (
-    <div
-      ref={gridRef}
-      className="flex h-full w-full overflow-hidden"
-      style={{
-        padding: `${config?.paddingY}px ${config?.paddingX}px`,
-      }}
-    >
-      {config ? (
-        <ReactGridLayout
-          className="h-full w-full"
-          style={{
-            backgroundPosition: `-${gutterSize / 2}x -${gutterSize / 2}px`,
-            backgroundSize: `${gridSize + gutterSize}px ${
-              gridSize + gutterSize
-            }px`,
-            backgroundImage: `radial-gradient(circle at 50%, #CCC, #CCC 3%, transparent 3.1%)`,
-          }}
-          width={config.width}
-          margin={[gutterSize, gutterSize]}
-          containerPadding={[0, 0]}
-          cols={config.columns}
-          onLayoutChange={handleLayoutChange}
-          rowHeight={gridSize}
-          maxRows={config.rows}
-          compactType={null}
-          isDroppable={true}
-          allowOverlap={false}
-          preventCollision={true}
-          layout={layouts}
-        >
-          {children}
-        </ReactGridLayout>
-      ) : null}
-      <footer className="fixed bottom-0 left-0 flex w-full justify-center p-2">
+    <div ref={gridRef} className="flex h-full w-full overflow-hidden p-2">
+      <div className="relative h-full w-full">
+        <GridBackground
+          subdivisions={1}
+          cellSize={gridSize + gutterSize}
+          offset={{ x: -gutterSize / 2, y: -gutterSize / 2 }}
+        />
+        {config ? (
+          <ReactGridLayout
+            className="h-full w-full"
+            width={config.width}
+            margin={[gutterSize, gutterSize]}
+            containerPadding={[0, 0]}
+            cols={config.columns}
+            onLayoutChange={handleLayoutChange}
+            rowHeight={gridSize}
+            maxRows={config.rows}
+            compactType={null}
+            isDroppable={true}
+            allowOverlap={false}
+            preventCollision={true}
+            onDragStart={handleDragStart}
+            layout={layouts}
+          >
+            {children}
+          </ReactGridLayout>
+        ) : null}
+      </div>
+      <footer className="fixed bottom-4 left-0 flex w-full justify-center p-2">
         <div className="flex items-center justify-center space-x-2">
           {isEditing ? (
             <button
@@ -174,11 +216,41 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
           )}
         </div>
       </footer>
-      {editingWidget && (
-        <WidgetEditor widget={editingWidget} onSubmit={handleWidgetEdited} />
+      {editorTarget && (
+        <WidgetEditor
+          widget={editorTarget}
+          onSubmit={handleWidgetEdited}
+          onCancel={handleCancelEditingWidget}
+        />
       )}
     </div>
   );
 };
 
 export default WidgetGrid;
+
+const GridBackground = ({
+  cellSize,
+  subdivisions = 0,
+  offset = { x: 0, y: 0 },
+}: {
+  subdivisions?: number;
+  cellSize: number;
+  offset: {
+    x: number;
+    y: number;
+  };
+}) => {
+  const size = cellSize / Math.pow(2, subdivisions);
+  console.log('size', size);
+  return (
+    <div
+      className="absolute inset-0 h-full w-full"
+      style={{
+        backgroundPosition: `-${offset.x}px -${offset.y}px`,
+        backgroundSize: `${size}px ${size}px`,
+        backgroundImage: `radial-gradient(circle at 50%, #CCC, #CCC, 1.5px, transparent 3.1%)`,
+      }}
+    ></div>
+  );
+};
