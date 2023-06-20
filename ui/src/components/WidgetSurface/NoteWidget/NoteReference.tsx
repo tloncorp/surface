@@ -19,7 +19,7 @@ function NoteReference({
   chFlag,
   nest,
   id,
-  isScrolling = false
+  isScrolling = false,
 }: {
   outline: DiaryOutline;
   chFlag: string;
@@ -54,7 +54,8 @@ function NoteReference({
 
     const truncatedContent = truncateProse(
       outline.content,
-      NOTE_REF_DISPLAY_LIMIT
+      Infinity
+      // NOTE_REF_DISPLAY_LIMIT
     );
 
     return <DiaryContent content={truncatedContent} isPreview />;
@@ -67,16 +68,16 @@ function NoteReference({
   const prettyDate = makePrettyDate(new Date(outline.sent));
 
   return (
-    <div className="note-inline-block group max-w-[600px] overflow-auto text-base">
+    <div className="note-inline-block group max-w-[600px] overflow-hidden rounded-3xl text-base">
       <div
         // onClick={handleOpenReferenceClick}
-        className="flex cursor-pointer flex-col space-y-2 p-4 group-hover:bg-gray-50"
+        className="h-full flex cursor-pointer flex-col space-y-2 p-4 group-hover:bg-gray-50 overflow-auto"
       >
         {outline.image ? (
           <div
             className="relative h-36 w-full rounded-lg bg-gray-100 bg-cover bg-center px-4"
             style={{
-              backgroundImage: `url(${outline.image})`
+              backgroundImage: `url(${outline.image})`,
             }}
           />
         ) : null}
@@ -92,7 +93,7 @@ function NoteReference({
                   className="relative outline outline-2 outline-white"
                   style={{
                     zIndex: 2 - index,
-                    transform: `translate(${index * -50}%)`
+                    transform: `translate(${index * -50}%)`,
                   }}
                 />
               ))}
@@ -107,12 +108,12 @@ function NoteReference({
           note.essay.author ? <Author ship={note.essay.author} /> : null
         */}
         {contentPreview}
-        <button
+        {/* <button
           // onClick={handleOpenReferenceClick}
           className="small-secondary-button w-[120px]"
         >
           <span className="text-gray-800">Continue Reading</span>
-        </button>
+        </button> */}
       </div>
       <ReferenceBar
         nest={nest}

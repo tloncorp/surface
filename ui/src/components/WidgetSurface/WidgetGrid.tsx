@@ -2,11 +2,7 @@ import { useSurfaceState } from '@/state/surface';
 import { WidgetPane } from '@/types/surface';
 import { Widget as WidgetConfig } from '@/widgets';
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import ReactGridLayout, {
-  ItemCallback,
-  Layout,
-  ReactGridLayoutProps,
-} from 'react-grid-layout';
+import ReactGridLayout, { ItemCallback, Layout } from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import Widget from './Widget';
@@ -159,15 +155,9 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
     [widgets]
   );
 
-  console.log('old', {
-    backgroundPosition: `-${gutterSize / 2}px -${gutterSize / 2}px`,
-    backgroundSize: `${gridSize + gutterSize}px ${gridSize + gutterSize}px`,
-    backgroundImage: `radial-gradient(circle at 50%, #F00, #F00, 3%, transparent 3.1%)`,
-  });
-
   return (
-    <div ref={gridRef} className="flex h-full w-full overflow-hidden p-2">
-      <div className="relative h-full w-full">
+    <div ref={gridRef} className="h-full w-full overflow-auto p-2">
+      <div className="relative">
         <GridBackground
           subdivisions={1}
           cellSize={gridSize + gutterSize}
@@ -182,7 +172,6 @@ const WidgetGrid = ({ id, pane }: WidgetGridProps) => {
             cols={config.columns}
             onLayoutChange={handleLayoutChange}
             rowHeight={gridSize}
-            maxRows={config.rows}
             compactType={null}
             isDroppable={true}
             allowOverlap={false}
@@ -242,10 +231,9 @@ const GridBackground = ({
   };
 }) => {
   const size = cellSize / Math.pow(2, subdivisions);
-  console.log('size', size);
   return (
     <div
-      className="absolute inset-0 h-full w-full"
+      className="absolute inset-0"
       style={{
         backgroundPosition: `-${offset.x}px -${offset.y}px`,
         backgroundSize: `${size}px ${size}px`,

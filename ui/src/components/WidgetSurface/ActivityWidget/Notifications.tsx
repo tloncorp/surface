@@ -61,8 +61,11 @@ export const Notifications = () => {
   const groups = useGroups();
 
   return (
-    <div className="h-full overflow-y-scroll rounded-md bg-gray-50">
-      <section className="w-full">
+    <div className="bg-white h-full overflow-hidden rounded-3xl border-2 border-gray-50 ">
+      <section className="w-full h-full overflow-y-scroll">
+      <h2 className="p-4 text-md pt-5 font-bold text-black">
+        Recent Notifications
+      </h2>
         {loaded ? (
           notifications.length === 0 ? (
             <div className="mt-3 flex w-full items-center justify-center">
@@ -73,12 +76,9 @@ export const Notifications = () => {
           ) : (
             notifications.map(grouping => (
               <div
-                className="mb-4 rounded-xl bg-gray-50 p-4"
+                className="mb-2 rounded-xl px-4 py-0"
                 key={grouping.date}
               >
-                <h2 className="mb-4 text-lg font-bold text-gray-400">
-                  {grouping.date}
-                </h2>
                 <ul className="space-y-2">
                   {grouping.skeins.map(b => (
                     <li key={b.time}>

@@ -39,8 +39,6 @@ const Widget = React.forwardRef<
       onPressRemove?.(widget);
     }, [onPressRemove, widget]);
 
-    if (!def) return <>No renderer found for widget</>;
-
     return (
       <div
         data-grid={widget.layout}
@@ -55,7 +53,7 @@ const Widget = React.forwardRef<
         {def ? (
           <def.Component widget={widget} layout={layout} />
         ) : (
-          'No renderer found for widget type' + widget.type
+          `No renderer found for widget type: '${widget.type}'.`
         )}
         {editMode && (
           <>

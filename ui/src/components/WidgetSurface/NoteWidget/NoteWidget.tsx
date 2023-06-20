@@ -11,7 +11,13 @@ export default function NoteWidget({
   const latestNote = letters.peekLargest();
 
   if (!latestNote) {
-    return 'Loading...';
+    return (
+      <div
+        className={`flex h-full w-full items-center justify-center rounded-2xl border-2 bg-white`}
+      >
+        <button className="button">Select Post</button>
+      </div>
+    );
   }
 
   return (
