@@ -1,12 +1,8 @@
-import { WidgetProps, Widget as WidgetConfig } from '@/widgets';
-import React, {
-  HTMLProps,
-  PropsWithChildren,
-  useCallback,
-  useState
-} from 'react';
-import { widgets } from '@/widgets';
-import WidgetEditor from './WidgetEditor';
+import { Widget as WidgetConfig, WidgetProps, widgets } from '@/widgets';
+import React, { HTMLProps, PropsWithChildren, useCallback } from 'react';
+import XIcon from '../icons/XIcon';
+import MenuIcon from '../icons/MenuIcon';
+import cn from 'classnames'
 
 const Widget = React.forwardRef<
   HTMLDivElement,
@@ -15,68 +11,75 @@ const Widget = React.forwardRef<
   // More info: https://github.com/react-grid-layout/react-grid-layout#custom-child-components-and-draggable-handles
   WidgetProps & {
     editMode?: boolean;
+    dragMode?: boolean;
+    onPressEdit?: (widget: WidgetConfig<any>) => void;
     onPressRemove?: (widget: WidgetConfig<any>) => void;
   } & PropsWithChildren<HTMLProps<HTMLDivElement>>
->(({ widget, editMode, onPressRemove, ...forwardProps }, ref) => {
-  const def = widgets[widget.type];
-  const [editingWidget, setEditingWidget] = useState(false);
+>(
+  (
+    { widget, editMode, dragMode, onPressEdit, onPressRemove, ...forwardProps },
+    ref
+  ) => {
+    const def = widgets[widget.type];
 
-  // All values in `react-grid-layout` `Layout`s are specified in grid units, and
-  // need to be translated to pixel dimensions to be useful. It's kind of a pain
-  // to do the translation, so for now we're just grabbing them out of the style
-  // attribute it's already calculating.
-  // TODO: Something better than this
-  const { width, height } = forwardProps.style ?? { width: 0, height: 0 };
-  const layout = {
-    ...widget.layout,
-    w: typeof width === 'string' ? parseInt(width) : width ?? 0,
-    h: typeof height === 'string' ? parseInt(height) : height ?? 0
-  };
+    // All values in `react-grid-layout` `Layout`s are specified in grid units, and
+    // need to be translated to pixel dimensions to be useful. It's kind of a pain
+    // to do the translation, so for now we're just grabbing them out of the style
+    // attribute it's already calculating.
+    // TODO: Something better than this
+    const { width, height } = forwardProps.style ?? { width: 0, height: 0 };
+    const layout = {
+      ...widget.layout,
+      w: typeof width === 'string' ? parseInt(width) : width ?? 0,
+      h: typeof height === 'string' ? parseInt(height) : height ?? 0,
+    };
 
-  const handlePressRemove = useCallback(() => {
-    onPressRemove?.(widget);
-  }, [onPressRemove, widget]);
+    const handlePressEdit = useCallback(() => {
+      onPressEdit?.(widget);
+    }, [onPressEdit, widget]);
 
-  if (!def) return <>No renderer found for widget</>;
+    const handlePressRemove = useCallback(() => {
+      onPressRemove?.(widget);
+    }, [onPressRemove, widget]);
 
-  return (
-    <div
-      data-grid={widget.layout}
-      ref={ref}
-      className="group"
-      {...forwardProps}
-      style={{ ...forwardProps.style }}
-    >
-      {def ? (
-        <def.Component
-          widget={widget}
-          editingWidget={editingWidget}
-          setEditingWidget={setEditingWidget}
-          // the clock widget needs these layout values
-          layout={layout}
-        />
-      ) : (
-        'No renderer found for widget type' + widget.type
-      )}
-      {editMode && !editingWidget && (
-        <>
-          <a
-            className="absolute -bottom-2 -left-2 -right-2 -top-2 z-10 flex items-center justify-center rounded-2xl"
-            style={{ backgroundColor: 'rgba(0,0,0,0.1)' }}
-            onClick={() => setEditingWidget(true)}
-          >
-            <span className="secondary-button">Edit</span>
-          </a>
+    return (
+      <div
+        data-grid={widget.layout}
+        ref={ref}
+        {...forwardProps}
+        style={{
+          ...forwardProps.style,
+          // This prevents click events from firing after the widget is dragged
+          ...(dragMode ? { pointerEvents: 'none' } : {}),
+        }}
+        className={cn(forwardProps.className, 'group')}
+      >
+        {def ? (
+          <def.Component
+            widget={widget}
+            layout={layout}
+            onPressEdit={onPressEdit}
+          />
+        ) : (
+          `No renderer found for widget type: '${widget.type}'.`
+        )}
+        <div className="absolute right-4 top-4 flex flex-row gap-1 hidden group-hover:flex">
           <button
-            onClick={handlePressRemove}
-            className="absolute right-0 top-0 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-white text-xl uppercase"
+            className="flex h-6 w-6 items-center justify-center rounded bg-black bg-opacity-10 text-white backdrop-blur"
+            onClick={handlePressEdit}
           >
-            &times;
+            <MenuIcon className="h-4 w-4" />
           </button>
-        </>
-      )}
-    </div>
-  );
-});
+          <button
+            className="flex h-6 w-6 items-center justify-center rounded bg-black bg-opacity-10 text-white backdrop-blur"
+            onClick={handlePressRemove}
+          >
+            <XIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+);
 
 export default Widget;

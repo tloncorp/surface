@@ -1,9 +1,10 @@
-import { useMemo } from "react";
-import useTime from "./useTime";
+import { useMemo } from 'react';
+import useTime from './useTime';
+import { ClockProps } from './ClockWidget';
 
-const colors = ["0F1F28", "366C84", "93BCCA", "F4EFDC", "E7DE92"];
+const colors = ['0F1F28', '366C84', '93BCCA', 'F4EFDC', 'E7DE92'];
 
-const ColorClock = ({ size }: { size: number }) => {
+const ColorClock = ({ size }: ClockProps) => {
   const time = useTime(100);
   const color = useMemo(() => {
     const dayProgress = time.decimal.day;
@@ -17,10 +18,10 @@ const ColorClock = ({ size }: { size: number }) => {
   return (
     <div
       style={{
-        width: size / 1.5,
-        height: size,
+        width: size[0],
+        height: size[1],
         backgroundColor: color,
-        borderRadius: "50%",
+        borderRadius: '50%',
         aspectRatio: 0.5,
       }}
     />
@@ -45,9 +46,9 @@ const rgbToHex = (r: number, g: number, b: number) => {
   return [r, g, b]
     .map((x) => {
       const hex = x.toString(16);
-      return hex.length === 1 ? "0" + hex : hex;
+      return hex.length === 1 ? '0' + hex : hex;
     })
-    .join("");
+    .join('');
 };
 
 export default ColorClock;

@@ -1,22 +1,22 @@
-import React, { useEffect, useMemo, useRef } from "react";
-import useTime from "./useTime";
+import React, { useEffect, useRef } from 'react';
+import useTime from './useTime';
 
 const borderTypes = [
-  "none",
-  "hidden",
-  "dotted",
-  "dashed",
-  "solid",
-  "double",
-  "groove",
-  "ridge",
-  "inset",
-  "outset",
+  'none',
+  'hidden',
+  'dotted',
+  'dashed',
+  'solid',
+  'double',
+  'groove',
+  'ridge',
+  'inset',
+  'outset',
 ] as const;
 
 type BorderType = (typeof borderTypes)[number];
 
-interface ClassicClockConfig {
+export interface ClassicClockConfig {
   backgroundColor: string;
   borderColor: string;
   borderType: BorderType;
@@ -43,16 +43,18 @@ interface ClassicClockConfig {
   };
 }
 
-const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
+const Clock: React.FC<{
+  size: [number, number];
+  config: ClassicClockConfig;
+}> = ({ size, config }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const config = useMemo(() => generateRandomConfig(), []);
   const time = useTime(1, 1000);
   const renderSize = Math.min(size[0], size[1]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const context = canvas.getContext("2d");
+    const context = canvas.getContext('2d');
     if (!context) return;
 
     // Clear the canvas
@@ -110,7 +112,7 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
       context.lineWidth = config.secondHand.width;
       context.stroke();
     }
-  }, [time, config]);
+  }, [time, config, renderSize]);
 
   return (
     <canvas
@@ -122,7 +124,7 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
         height: renderSize,
         backgroundColor: config.backgroundColor,
         borderRadius: config.borderRadius,
-        filter: `blur(${blur}px)`,
+        filter: `blur(${config.blur}px)`,
         borderWidth: `${config.borderWidth}px`,
         borderStyle: config.borderType,
         borderColor: config.borderColor,
@@ -132,64 +134,6 @@ const Clock: React.FC<{ size: [number, number] }> = ({ size }) => {
 };
 
 export default Clock;
-
-function generateRandomConfig(): ClassicClockConfig {
-  const lengths = [
-    random.number(0.1, 1.0),
-    random.number(0.1, 1.0),
-    random.number(0.1, 1.0),
-  ].sort((a, b) => a - b);
-  const widths = [random.int(1, 10), random.int(1, 10), random.int(1, 10)].sort(
-    (a, b) => a - b
-  );
-  console.log(widths, lengths);
-  return {
-    backgroundColor: random.color(),
-    borderColor: random.color(),
-    borderType: borderTypes[random.int(0, borderTypes.length - 1)],
-    borderWidth: random.int(0, 20),
-    borderRadius: random.int(0, 200),
-    blur: random.boolean() ? 0 : random.int(0, 20),
-    hourHand: {
-      enabled: true,
-      width: widths[2],
-      length: lengths[0],
-      color: random.color(),
-    },
-    minuteHand: {
-      enabled: true,
-      width: widths[1],
-      length: lengths[1],
-      color: random.color(),
-    },
-    secondHand: {
-      enabled: true,
-      width: widths[0],
-      length: lengths[2],
-      color: random.color(),
-    },
-  };
-}
-
-const random = {
-  int: (min: number, max: number) => {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  },
-  number: (min: number, max: number) => {
-    return Math.random() * (max - min) + min;
-  },
-  color: () => {
-    const [h, s, l] = [
-      random.int(0, 360),
-      random.int(0, 100),
-      random.int(0, 100),
-    ];
-    return `hsl(${h}, ${s}%, ${l}%)`;
-  },
-  boolean: () => {
-    return Math.random() > 0.5;
-  },
-};
 
 function circlePoint(
   x: number,

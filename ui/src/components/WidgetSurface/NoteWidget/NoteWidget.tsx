@@ -1,70 +1,27 @@
-import { useDiaries, useNotes } from '@/state/diary/diary';
+import { useNotes } from '@/state/diary/diary';
 import { WidgetProps } from '@/widgets';
-import { useEffect, useMemo } from 'react';
 import NoteReference from './NoteReference';
-import { getQueryParam } from '@/logic/utils';
-import { useEditWidget, usePaneFromWidget, useSurface } from '@/state/surface';
-import WidgetEditor from '../WidgetEditor';
-import { RJSFSchema } from '@rjsf/utils';
+import { useCallback } from 'react';
 
 export default function NoteWidget({
   widget,
-  editingWidget,
-  setEditingWidget
+  onPressEdit
 }: WidgetProps<{ chFlag: string }>) {
-  const surfaceId = getQueryParam('surface') ?? 'default';
-  const surface = useSurface(surfaceId);
-  const pane = usePaneFromWidget(surfaceId, widget.id);
-  const handleEditWidget = useEditWidget(
-    surfaceId,
-    widget.id,
-    setEditingWidget
-  );
   const { letters } = useNotes(widget.config.chFlag ?? '');
   const latestNote = letters.peekLargest();
-  const diaries = useDiaries();
-  const diaryFlags = Object.keys(diaries);
 
-  useEffect(() => {
-    if (!widget.config.chFlag && setEditingWidget) {
-      setEditingWidget(true);
-    }
-  }, [widget.config.chFlag]);
-
-  const params: RJSFSchema = useMemo(() => {
-    return {
-      properties: {
-        chFlag: {
-          title: 'Channel',
-          type: 'string',
-          oneOf: diaryFlags.map(flag => ({
-            title: flag,
-            const: flag
-          }))
-        }
-      }
-    };
-  }, [diaryFlags]);
-
-  if (!pane || !surface) {
-    return null;
-  }
-
-  if (editingWidget) {
-    return (
-      <WidgetEditor
-        widget={widget}
-        onSubmit={handleEditWidget}
-        onCancel={() =>
-          setEditingWidget && latestNote ? setEditingWidget(false) : undefined
-        }
-        params={params}
-      />
-    );
-  }
+  const handlePressEdit = useCallback(() => {
+    onPressEdit?.(widget);
+  }, [])
 
   if (!latestNote) {
-    return 'Loading...';
+    return (
+      <div
+        className={`flex h-full w-full items-center justify-center rounded-2xl border-2 bg-white`}
+      >
+        <button className="button" onClick={handlePressEdit}>Select Post</button>
+      </div>
+    );
   }
 
   return (

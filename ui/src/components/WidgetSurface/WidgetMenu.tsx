@@ -14,6 +14,7 @@ export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
 
   const onWidgetSelected = useCallback(
     (widget: WidgetDef) => {
+      console.log('add widget', id, pane);
       addWidget(id, pane, widget);
     },
     [pane, id]
@@ -22,7 +23,7 @@ export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
   return (
     <Dropdown.Root>
       <Dropdown.Trigger asChild>
-        <button className="nav-button default-focus">Add Widget</button>
+        <button className="nav-button default-focus bg-black bg-opacity-10 backdrop-blur">Add Widget</button>
       </Dropdown.Trigger>
       <Dropdown.Content
         align="start"
@@ -33,7 +34,7 @@ export const WidgetMenu = ({ id, pane }: WidgetMenuProps) => {
         <Dropdown.Label className="p-2 text-gray-400">
           Add Widget
         </Dropdown.Label>
-        {Object.values(widgets).map(widget => {
+        {Object.values(widgets).map((widget) => {
           const Icon = widget.icon;
           return (
             <Dropdown.Item

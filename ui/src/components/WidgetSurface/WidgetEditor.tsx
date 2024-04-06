@@ -1,108 +1,131 @@
+import { useInstalledApps } from '@/state/docket';
 import { Widget as WidgetConfig, WidgetProps } from '@/widgets';
+import Form, { IChangeEvent } from '@rjsf/core';
+import {
+  WidgetProps as FormWidgetProps,
+  RJSFSchema,
+  RJSFValidationError,
+} from '@rjsf/utils';
 import validator from '@rjsf/validator-ajv8';
-import Form from '@rjsf/core';
-import { FormEvent, useCallback, useState } from 'react';
-import { RJSFSchema, UiSchema } from '@rjsf/utils';
+import { useCallback, useRef, useState } from 'react';
+import { widgets } from '../../widgets';
 import Widget from './Widget';
-import { widgets } from '@/widgets';
+import { useDiaries } from '@/state/diary/diary';
 
 const WidgetEditor = ({
   widget,
   onSubmit,
   onCancel,
-  showPreview = false,
-  params
 }: WidgetProps & {
   onSubmit?: (widget: WidgetConfig) => void;
   onCancel?: () => void;
-  showPreview?: boolean;
   params?: RJSFSchema;
 }) => {
+  const formRef = useRef<Form>(null);
   const definition = widgets[widget.type];
   const [workingWidget, setWorkingWidget] = useState(widget);
 
-  const handleChange = useCallback((e: FormEvent<any>) => {
+  const handleChange = useCallback((e: IChangeEvent) => {
     setWorkingWidget({
       ...workingWidget,
-      config: e.formData
+      config: e.formData,
     });
   }, []);
 
-  const handleSubmit = useCallback((e: { formData: any }) => {
+  const handleSubmit = useCallback(() => {
     onSubmit?.({
       ...widget,
-      config: e.formData
+      config: formRef.current?.state.formData,
     });
   }, []);
 
-  const handleError = useCallback((e: FormEvent) => {
-    console.log('error', e);
+  const handleError = useCallback((errors: RJSFValidationError[]) => {
+    console.log('error', errors);
   }, []);
 
   return (
-    <div className="flex h-full w-full items-center justify-center rounded-2xl">
+    <div className="fixed left-0 top-0 flex h-full w-full items-center justify-center rounded-2xl bg-black bg-opacity-10">
       <div
-        className="flex flex-col rounded-xl bg-white p-8"
+        className="flex flex-row rounded-xl bg-white"
         style={{ width: 700, minHeight: 400, maxHeight: '80vh' }}
       >
-        <h2 className="font-sans text-base text-xl font-bold">
-          Edit {definition.name} Widget
-        </h2>
-        <div className="flex flex-1 flex-row gap-4">
-          {showPreview && (
-            <div className="flex flex-col">
-              <div className="flex flex-1 items-center justify-center">
-                <Widget
-                  widget={workingWidget}
-                  style={{
-                    width: '200px',
-                    height: '200px',
-                    position: 'relative'
-                  }}
-                />
-              </div>
-            </div>
-          )}
-          <div className="flex flex-1">
-            <Form
-              className="rjsf flex flex-1 flex-col justify-between"
-              noValidate={true}
-              formData={workingWidget.config}
-              schema={params ?? definition.params}
-              uiSchema={uiSchema}
-              validator={validator}
-              onChange={handleChange}
-              onSubmit={handleSubmit}
-              onError={handleError}
-            >
-              <div className="flex flex-row justify-end gap-2">
-                {onCancel && (
-                  <button className="secondary-button" onClick={onCancel}>
-                    Cancel
-                  </button>
-                )}
-                <button className="button" type="submit">
-                  Done
-                </button>
-              </div>
-            </Form>
+        <div className="p-right-0 flex flex-col justify-between p-8">
+          <h2 className="font-sans text-base text-xl font-bold">Edit Widget</h2>
+          <div className="flex flex-1 items-center justify-center">
+            <Widget
+              widget={workingWidget}
+              style={{
+                width: '200px',
+                height: '200px',
+                position: 'relative',
+              }}
+            />
           </div>
+
+          <div className="flex flex-row justify-start gap-2">
+            <button className="secondary-button" onClick={onCancel}>
+              Cancel
+            </button>
+            <button className="button" type="submit" onClick={handleSubmit}>
+              Done
+            </button>
+          </div>
+        </div>
+        <div className="p-left-0 flex flex-1 overflow-auto p-8">
+          <Form
+            ref={formRef}
+            className="rjsf flex flex-1 flex-col justify-between"
+            noValidate={true}
+            formData={workingWidget.config}
+            schema={definition.params}
+            uiSchema={{
+              'ui:submitButtonOptions': {
+                norender: true,
+              },
+            }}
+            validator={validator}
+            onChange={handleChange}
+            onSubmit={handleSubmit}
+            onError={handleError}
+            widgets={{ charge: ChargeInput, channel: ChannelInput }}
+          ></Form>
         </div>
       </div>
     </div>
   );
 };
 
-const uiSchema: UiSchema = {
-  'ui:submitButtonOptions': {
-    props: {
-      disabled: false,
-      className: 'btn btn-info'
-    },
-    norender: false,
-    submitText: 'Done'
-  },
-  'ui:classNames': 'flex flex-1 flex-col justify-between'
+export default WidgetEditor;
+
+const ChargeInput = ({ value, onChange }: FormWidgetProps) => {
+  const apps = useInstalledApps();
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
+      {apps.map((a) => (
+        <option key={a.desk} value={a.desk}>
+          {a.title}
+        </option>
+      ))}
+    </select>
+  );
 };
 
-export default WidgetEditor;
+const ChannelInput = ({
+  value,
+  onChange,
+  schema,
+  registry,
+  options,
+}: FormWidgetProps) => {
+  console.log(schema, registry, options);
+  const diaries = useDiaries();
+  return (
+    <select value={value} onChange={(e) => onChange(e.target.value)}>
+      {Object.keys(diaries).map((a) => (
+        <option key={a} value={a}>
+          {a}
+        </option>
+      ))}
+    </select>
+  );
+};

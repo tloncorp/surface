@@ -55,28 +55,28 @@ export const useSurfaceState = create<SurfaceState>()(
         surfaces: [] as Surface[],
         index: {},
         activeSurface: getQueryParam('surface'),
-        switchSurface: id => {
+        switchSurface: (id) => {
           set({ activeSurface: id });
         },
-        addSurface: surface => {
-          set(draft => ({
+        addSurface: (surface) => {
+          set((draft) => ({
             ...updateSurfaces([...draft.surfaces, surface]),
-            activeSurface: surface.id
+            activeSurface: surface.id,
           }));
         },
-        addSurfaceWithPane: pane => {
+        addSurfaceWithPane: (pane) => {
           const id = pane.title + new Date().getTime();
           const surface: Surface = {
             id,
             panes: [pane],
-            addedAt: new Date().getTime()
+            addedAt: new Date().getTime(),
           };
-          set(draft => ({
+          set((draft) => ({
             ...updateSurfaces([...draft.surfaces, surface]),
-            activeSurface: surface.id
+            activeSurface: surface.id,
           }));
         },
-        removeSurface: id => {
+        removeSurface: (id) => {
           const { index: surfaceIndexes } = get();
           const index = surfaceIndexes?.[id] ?? -1;
           if (index === -1) {
@@ -84,7 +84,7 @@ export const useSurfaceState = create<SurfaceState>()(
             return;
           }
 
-          set(draft => {
+          set((draft) => {
             const { surfaces: surfaces, activeSurface } = draft;
             const newSurfaces = [...surfaces];
             newSurfaces.splice(index, 1);
@@ -94,15 +94,15 @@ export const useSurfaceState = create<SurfaceState>()(
                 : activeSurface;
             return {
               ...updateSurfaces(newSurfaces),
-              activeSurface: newActiveSurface
+              activeSurface: newActiveSurface,
             };
           });
         },
-        splitSurface: id => {
+        splitSurface: (id) => {
           const {
             surfaces: surfaces,
             index: surfaceIndexes,
-            activeSurface
+            activeSurface,
           } = get();
           const index = surfaceIndexes?.[id] ?? -1;
           if (index === -1) {
@@ -114,7 +114,7 @@ export const useSurfaceState = create<SurfaceState>()(
             return {
               id: surface.id + '-' + i,
               addedAt: surface.addedAt + i,
-              panes: [pane]
+              panes: [pane],
             };
           });
           const newSurfaces = [...surfaces];
@@ -126,7 +126,7 @@ export const useSurfaceState = create<SurfaceState>()(
               : activeSurface;
           set({
             ...updateSurfaces(newSurfaces),
-            activeSurface: newActiveSurface
+            activeSurface: newActiveSurface,
           });
         },
         combineSurfaces: (draggedId, dropTargetId) => {
@@ -153,9 +153,9 @@ export const useSurfaceState = create<SurfaceState>()(
           const newSurface = {
             id: draggedSurface.id,
             addedAt: draggedSurface.addedAt,
-            panes: [...dropTargetSurface.panes, ...draggedSurface.panes]
+            panes: [...dropTargetSurface.panes, ...draggedSurface.panes],
           };
-          const newSurfaces = surfaces.flatMap(surface => {
+          const newSurfaces = surfaces.flatMap((surface) => {
             if (surface.id === draggedId) {
               return [];
             } else if (surface.id === dropTargetId) {
@@ -176,6 +176,10 @@ export const useSurfaceState = create<SurfaceState>()(
         },
         addWidget: (id, pane, widget) => {
           const wId = `${widget.id}-${Date.now()}`;
+          const config =
+            widget.defaultParams instanceof Function
+              ? widget.defaultParams()
+              : widget.defaultParams ?? {};
           const newWidget: Widget = {
             id: wId,
             type: widget.id,
@@ -183,21 +187,19 @@ export const useSurfaceState = create<SurfaceState>()(
               i: wId,
               x: 0,
               y: 0,
-              ...widget.defaultSize
+              ...widget.defaultSize,
             },
-            config: {}
+            config,
           };
-          console.log({ newWidget });
           get().updatePane(id, {
             ...pane,
-            widgets: [...pane.widgets, newWidget]
+            widgets: [...pane.widgets, newWidget],
           });
         },
         updatePane: (id, pane) => {
-          const surface = get().surfaces.find(surface => surface.id === id);
+          const surface = get().surfaces.find((surface) => surface.id === id);
 
           if (!surface) {
-            console.warn('attempted to add widget to non-existent surface', id);
             return;
           }
 
@@ -205,20 +207,20 @@ export const useSurfaceState = create<SurfaceState>()(
             ...surface,
             panes:
               surface.panes.length > 0
-                ? surface.panes.map(p => (p.id === pane.id ? pane : p))
-                : [pane]
+                ? surface.panes.map((p) => (p.id === pane.id ? pane : p))
+                : [pane],
           };
-          set(draft => ({
+          set((draft) => ({
             ...updateSurfaces(
-              draft.surfaces.map(surface =>
+              draft.surfaces.map((surface) =>
                 surface.id === id ? newSurface : surface
               )
-            )
+            ),
           }));
-        }
+        },
       }),
       {
-        name: 'surface-state'
+        name: 'surface-state',
       }
     )
   )
@@ -226,10 +228,12 @@ export const useSurfaceState = create<SurfaceState>()(
 
 export function usePaneFromWidget(surfaceId: string, widgetId: string) {
   const { surfaces } = useSurfaceState();
-  const surface = surfaces.find(s => s.id === surfaceId);
+  const surface = surfaces.find((s) => s.id === surfaceId);
   const pane = surface?.panes.find(
-    p =>
-      p.type === 'widget' && p.widgets && p.widgets.find(w => w.id === widgetId)
+    (p) =>
+      p.type === 'widget' &&
+      p.widgets &&
+      p.widgets.find((w) => w.id === widgetId)
   );
 
   return pane;
@@ -237,7 +241,7 @@ export function usePaneFromWidget(surfaceId: string, widgetId: string) {
 
 export function useSurface(surfaceId: string) {
   const { surfaces } = useSurfaceState();
-  const surface = surfaces.find(s => s.id === surfaceId);
+  const surface = surfaces.find((s) => s.id === surfaceId);
   return surface;
 }
 
@@ -253,7 +257,7 @@ export function useEditWidget(
 
   const handleWidgetEdited = useCallback(
     (updatedWidget: Widget) => {
-      const newWidgets = widgets.map(item => {
+      const newWidgets = widgets.map((item) => {
         return item.id === updatedWidget?.id ? updatedWidget : item;
       });
       if (!surface) {
@@ -265,7 +269,7 @@ export function useEditWidget(
       }
       updatePane(surface.id, {
         ...pane,
-        widgets: newWidgets
+        widgets: newWidgets,
       } as WidgetPane);
 
       setEditingWidget && setEditingWidget(false);

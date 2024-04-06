@@ -5,7 +5,7 @@ const config = {
     'tailwindcss/nesting': {},
     tailwindcss: {},
     autoprefixer: {},
-  }
+  },
 };
 
-export default config;
+module.exports = config;
